@@ -126,8 +126,6 @@ Or, you can get the root directory of the share and `listFiles:` there:
 SMBFile *root = [SMBFile rootOfShare:share];
 
 [root listFiles:^(NSArray<SMBFile *> *files, NSError *error) {
-	[expectation fulfill];
-
 	if (error) {
 		NSLog(@"Unable to list files: %@", error);
 	} else {
@@ -136,4 +134,4 @@ SMBFile *root = [SMBFile rootOfShare:share];
 }];
 ```
 
-Both methods are equivalent and the choice is just a matter of taste.
+Both methods are equivalent and the choice is just a matter of your personal taste.
