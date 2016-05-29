@@ -1,5 +1,5 @@
 # SMBClient License
-SMBClient is dual-licensed under both the MIT License, and the LGPL v2.1 (or later) License.
+`SMBClient` is dual-licensed under both the MIT License, and the LGPL v2.1 (or later) License.
 
 This means that it is up to you, to choose the license appropriate for you. Normally your choice will depend on your choice of license for `libdsm`. The `libdsm` library is available under LGPL v2.1 (or later) or a commercial license. If you are using `libdsm` under the LGPL, `SMBClient` is available under the same license. If you have a commercial license for libdsm, you might want to choose the MIT license for this library.
 
