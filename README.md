@@ -34,7 +34,13 @@ You can also limit the search to file servers:
 } removed:nil];
 ```
 
-If however you don't need discovery, you can also instantiate a file server directly:
+When your app goes into the background, or you don't need discovery anymore, make sure to stop it:
+
+```objectivec
+[[SMBDiscovery sharedInstance] stopDiscovery];
+```
+
+If however you don't need/want discovery at all, you can also instantiate a file server directly:
 
 ```objectivec
 NSString *host = @"localhost";
@@ -77,7 +83,7 @@ List the shares on a file server:
 Or, if you already know the name of a share you want to use:
 
 ```objectivec
-[fileServer findShare:@"Guest Share" completion:^(SMBShare *share, NSError * error) {
+[fileServer findShare:@"Guest Share" completion:^(SMBShare *share, NSError *error) {
 	if (error) {
 		NSLog(@"Unable to find share: %@", error);
 	} else {
@@ -86,10 +92,10 @@ Or, if you already know the name of a share you want to use:
 }];
 ```
 
-You need to open a share to work on it:
+You need to open a share to be able to work on it:
 
 ```objectivec
-[share open:^(NSError * _Nullable error) {
+[share open:^(NSError *error) {
 	if (error) {
 		NSLog(@"Unable to open share: %@", error);
 	} else {
@@ -98,6 +104,36 @@ You need to open a share to work on it:
 }];
 ```
 
+Don't forget to `close:` the share, once you're done.
 
+### List files
 
-    
+You have two options to list the files on an open share. Either use `listFiles:` on the share instance:
+
+```objectivec
+[share listFiles:^(NSArray<SMBFile *> *files, NSError *error) {
+	if (error) {
+		NSLog(@"Unable to list files: %@", error);
+	} else {
+		NSLog(@"Found %lu files", (unsigned long)files.count);
+	}
+}];
+```
+
+Or, you can get the root directory of the share and `listFiles:` there:
+
+```objectivec
+SMBFile *root = [SMBFile rootOfShare:share];
+
+[root listFiles:^(NSArray<SMBFile *> *files, NSError *error) {
+	[expectation fulfill];
+
+	if (error) {
+		NSLog(@"Unable to list files: %@", error);
+	} else {
+		NSLog(@"Found %lu files", (unsigned long)files.count);
+	}
+}];
+```
+
+Both methods are equivalent and the choice is just a matter of taste.
