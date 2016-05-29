@@ -41,3 +41,21 @@ NSString *host = @"localhost";
 
 SMBFileServer *fileServer = [[SMBFileServer alloc] initWithHost:host netbiosName:host group:nil];
 ```
+
+### Login
+
+Be it through discovery or direct instantiation, once you have a file server, you might want to login:
+
+```objectivec
+[fileServer connect:@"john" password:@"secret" completion:^(BOOL guest, NSError *error) {
+	if (error) {
+		NSLog(@"Unable to connect: %@", error);
+	} else if (guest) {
+		NSLog(@"Logged in as guest");
+	} else {
+		NSLog(@"Logged in");
+	}
+}];
+```
+
+    
