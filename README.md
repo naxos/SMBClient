@@ -28,7 +28,16 @@ You can also limit the search to file servers:
 
 ```objectivec
 [[SMBDiscovery sharedInstance] startDiscoveryOfType:SMBDeviceTypeFileServer added:^(SMBDevice *device) {
-    NSLog(@"File server added: %@", (SMBFileServer *)device);
+	SMBFileServer *fileServer = (SMBFileServer *)device;
+	
+    NSLog(@"File server added: %@", fileServer);
 } removed:nil];
 ```
 
+If however you don't need discovery, you can also instantiate a file server directly:
+
+```objectivec
+NSString *host = @"localhost";
+
+SMBFileServer *fileServer = [[SMBFileServer alloc] initWithHost:host netbiosName:host group:nil];
+```
