@@ -14,9 +14,9 @@
 
 ### Discovery
 
-To start the discovery of SMB devices on your network
+Start the discovery of SMB devices on your network:
 
-```Objective C
+```objectivec
 [[SMBDiscovery sharedInstance] startDiscoveryOfType:SMBDeviceTypeAny added:^(SMBDevice *device) {
     NSLog(@"Device added: %@", device);
 } removed:^(SMBDevice *device) {
@@ -24,9 +24,9 @@ To start the discovery of SMB devices on your network
 }];
 ```
 
-You can also limit the serch to file servers:
+You can also limit the search to file servers:
 
-```Objective C
+```objectivec
 [[SMBDiscovery sharedInstance] startDiscoveryOfType:SMBDeviceTypeFileServer added:^(SMBDevice *device) {
     NSLog(@"File server added: %@", (SMBFileServer *)device);
 } removed:nil];
