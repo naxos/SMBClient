@@ -33,8 +33,8 @@ typedef NS_OPTIONS(NSUInteger, SMBDeviceType) {
     SMBDeviceTypeFileServer = 1 << 3,
     SMBDeviceTypeDomainMaster = 1 << 4,
     
-    SMBDeviceTypeMaskNone = 0,
-    SMBDeviceTypeMaskAny = SMBDeviceTypeUnknown | SMBDeviceTypeWorkstation | SMBDeviceTypeMessenger | SMBDeviceTypeFileServer | SMBDeviceTypeDomainMaster
+    SMBDeviceTypeNone = 0,
+    SMBDeviceTypeAny = SMBDeviceTypeUnknown | SMBDeviceTypeWorkstation | SMBDeviceTypeMessenger | SMBDeviceTypeFileServer | SMBDeviceTypeDomainMaster
 };
 
 @property (nonatomic, readonly) SMBDeviceType type;

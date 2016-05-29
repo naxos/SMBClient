@@ -3,9 +3,32 @@
 
 `SMBClient` is built on top of [libdsm](http://videolabs.github.io/libdsm), a low level SMB client library written in C. A copy of libdsm is embedded in this library to eliminate external dependencies.
 
-##Features
+## Features
 * Discover SMB devices on your network
 * List file shares
 * List/create/delete directories
 * Read file meta data
 * Create/read/write files
+
+## Examples
+
+### Discovery
+
+To start the discovery of SMB devices on your network
+
+```Objective C
+[[SMBDiscovery sharedInstance] startDiscoveryOfType:SMBDeviceTypeAny added:^(SMBDevice *device) {
+    NSLog(@"Device added: %@", device);
+} removed:^(SMBDevice *device) {
+    NSLog(@"Device removed: %@", device);
+}];
+```
+
+You can also limit the serch to file servers:
+
+```Objective C
+[[SMBDiscovery sharedInstance] startDiscoveryOfType:SMBDeviceTypeFileServer added:^(SMBDevice *device) {
+    NSLog(@"File server added: %@", (SMBFileServer *)device);
+} removed:nil];
+```
+
