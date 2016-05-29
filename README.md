@@ -135,3 +135,42 @@ SMBFile *root = [SMBFile rootOfShare:share];
 ```
 
 Both methods are equivalent and the choice is just a matter of your personal taste.
+
+You can also filter files when you list them, e.g. to only list directories:
+
+```objectivec
+[root listFilesUsingFilter:^BOOL(SMBFile *file) {
+	return file.isDirectory;
+} completion:^(NSArray<SMBFile *> *files, NSError *error) {
+	if (error) {
+		NSLog(@"Unable to list files: %@", error);
+	} else {
+		NSLog(@"Found %lu files", (unsigned long)files.count);
+	}
+}];
+```
+
+This brings us to the meta data of files.
+
+### Meta data
+
+All properties (including `isDirectory` and `exists`) of the `SMBFile` class apart from `path` (and `name`, which is part of `path`) are considered meta data. Meta data are read, when a file is being listed, opened or closed. Meta data are not updated automatically and they are not live data. You can check if the meta data was already read for an instance of `SMBFile` with the `hasStatus` property. The property `statusTime` returns the date the meta data was last read (or nil if it was never read). 
+
+To explicitly read or update a file's meta data use `updateStatus:`:
+
+```objectivec
+SMBFile *file = [SMBFile fileWithPath:@"/a/test.txt" share:share];
+
+[file updateStatus:^(NSError *error) {
+	if (error) {
+		NSLog(@"Unable to read the meta data: %@", error);
+	} else {
+		if (file.exists) {
+			NSLog(@"File %@", file);
+		} else {
+			NSLog(@"File does not exist");
+		}
+	}
+}];
+```
+

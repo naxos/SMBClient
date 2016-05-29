@@ -56,6 +56,79 @@ static NSString *password = nil;
 }
 
 - (void)test {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Test"];
+
+    SMBFileServer *fileServer = [[SMBFileServer alloc] initWithHost:host netbiosName:host group:nil];
+    
+    [fileServer connectAsUser:@"john" password:@"secret" completion:^(BOOL guest, NSError *error) {
+        if (error) {
+            NSLog(@"Unable to connect: %@", error);
+        } else {
+            NSLog(@"Logged in");
+            
+            [fileServer listShares:^(NSArray<SMBShare *> *shares, NSError *error) {
+                
+                if (error) {
+                    NSLog(@"Unable to connect: %@", error);
+                } else {
+                    for (SMBShare *share in shares) {
+                        NSLog(@"Got share: %@", share.name);
+                    }
+                    
+                    [fileServer findShare:@"Guest Share" completion:^(SMBShare *share, NSError * error) {
+
+                        if (error) {
+                            NSLog(@"Unable to find share: %@", error);
+                        } else {
+                            NSLog(@"Got share: %@", share.name);
+                            
+                            [share open:^(NSError * _Nullable error) {
+
+                                if (error) {
+                                    NSLog(@"Unable to open share: %@", error);
+                                } else {
+                                    NSLog(@"Opened share '%@'", share.name);
+                                    
+                                    SMBFile *root = [SMBFile rootOfShare:share];
+                                                                        
+                                    [root listFiles:^(NSArray<SMBFile *> *files, NSError *error) {
+                                        if (error) {
+                                            NSLog(@"Unable to list files: %@", error);
+                                        } else {
+                                            NSLog(@"Found %lu files", (unsigned long)files.count);
+                                        }
+
+                                        SMBFile *file = [SMBFile fileWithPath:@"/a/test.txt" share:share];
+                                        
+                                        [file updateStatus:^(NSError * _Nullable error) {
+                                            [expectation fulfill];
+                                            
+                                            if (error) {
+                                                NSLog(@"Unable to read the meta data: %@", error);
+                                            } else {
+                                                if (file.exists) {
+                                                    NSLog(@"File %@", file);
+                                                } else {
+                                                    NSLog(@"File does not exist");
+                                                }
+                                            }
+                                        }];
+                                    }];
+
+                                    
+                                }
+                            }];
+                        }
+                    }];
+                }
+            }];
+        }
+    }];
+    
+    [self waitForExpectationsWithTimeout:15.0 handler:nil];
+}
+
+- (void)_test {
     
     // ----------------- Discovery ----------------- //
     
