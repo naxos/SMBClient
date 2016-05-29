@@ -30,7 +30,7 @@
 
 
 // netbios name, ip address or hostname of the server
-static NSString *fileServer = @"192.168.178.56";
+static NSString *host = @"192.168.178.56";
 // name of a share on the server
 static NSString *fileShare = @"Guest Share";
 // credentials of a user with write access to the share,
@@ -66,7 +66,7 @@ static NSString *password = nil;
     BOOL ok = [[SMBDiscovery sharedInstance] startDiscoveryOfType:SMBDeviceTypeFileServer added:^(SMBDevice *device) {
         NSLog(@"Device added: %@", device);
         
-        if ([device.netbiosName isEqualToString:fileServer] || [device.host isEqualToString:fileServer]) {
+        if ([device.netbiosName isEqualToString:host] || [device.host isEqualToString:host]) {
             server = (SMBFileServer *)device;
             
             [discoveryExpectation fulfill];
@@ -79,14 +79,14 @@ static NSString *password = nil;
     
     [self waitForExpectationsWithTimeout:5.0 handler:nil];
     
-    XCTAssert(server != nil, @"Server '%@' not found", fileServer);
+    XCTAssert(server != nil, @"Server '%@' not found", host);
     
     // ----------------- Connection ----------------- //
     
     if (server) {
         XCTestExpectation *connectExpectation = [self expectationWithDescription:@"Connection"];
         
-        [server connect:username password:password completion:^(BOOL guest, NSError *error) {
+        [server connectAsUser:username password:password completion:^(BOOL guest, NSError *error) {
             
             [connectExpectation fulfill];
             

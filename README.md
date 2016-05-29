@@ -47,7 +47,7 @@ SMBFileServer *fileServer = [[SMBFileServer alloc] initWithHost:host netbiosName
 Be it through discovery or direct instantiation, once you have a file server, you might want to login:
 
 ```objectivec
-[fileServer connect:@"john" password:@"secret" completion:^(BOOL guest, NSError *error) {
+[fileServer connectAsUser:@"john" password:@"secret" completion:^(BOOL guest, NSError *error) {
 	if (error) {
 		NSLog(@"Unable to connect: %@", error);
 	} else if (guest) {
@@ -57,5 +57,47 @@ Be it through discovery or direct instantiation, once you have a file server, yo
 	}
 }];
 ```
+
+### Shares
+
+List the shares on a file server:
+
+```objectivec
+[fileServer listShares:^(NSArray<SMBShare *> *shares, NSError *error) {
+	if (error) {
+		NSLog(@"Unable to connect: %@", error);
+	} else {
+		for (SMBShare *share in shares) {
+			NSLog(@"Got share: %@", share.name);
+		}
+	}
+}];
+```
+
+Or, if you already know the name of a share you want to use:
+
+```objectivec
+[fileServer findShare:@"Guest Share" completion:^(SMBShare *share, NSError * error) {
+	if (error) {
+		NSLog(@"Unable to find share: %@", error);
+	} else {
+		NSLog(@"Got share: %@", share.name);
+	}
+}];
+```
+
+You need to open a share to work on it:
+
+```objectivec
+[share open:^(NSError * _Nullable error) {
+	if (error) {
+		NSLog(@"Unable to open share: %@", error);
+	} else {
+		NSLog(@"Opened share '%@'", share.name);
+	}
+}];
+```
+
+
 
     

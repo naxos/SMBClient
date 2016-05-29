@@ -57,7 +57,7 @@
     }
 }
 
-- (void)connect:(NSString *)username password:(NSString *)password completion:(void (^)(BOOL, NSError *))completion {
+- (void)connectAsUser:(NSString *)username password:(NSString *)password completion:(void (^)(BOOL, NSError *))completion {
     [self disconnect:nil];
     
     dispatch_async(_serialQueue, ^{
