@@ -51,7 +51,7 @@ SMBFileServer *fileServer = [[SMBFileServer alloc] initWithHost:host netbiosName
 
 ### Login
 
-Be it through discovery or direct instantiation, once you have a file server, you might want to login:
+Be it through discovery or direct instantiation, once you have a file server instance, you might want to login:
 
 ```objectivec
 [fileServer connectAsUser:@"john" password:@"secret" completion:^(BOOL guest, NSError *error) {
@@ -157,7 +157,7 @@ This brings us to the meta data of files.
 
 ### Meta data
 
-All properties (including `isDirectory` and `exists`) of the `SMBFile` class apart from `path` (and `name`, which is part of `path`) are considered meta data. Meta data are read, when a file is being listed, opened or closed. Meta data are not live data and they are not updated automatically. You can check if the meta data was already read for an instance of `SMBFile` with the `hasStatus` property. The property `statusTime` returns the date the meta data was last read (or nil if it was never read). 
+All properties (including `isDirectory` and `exists`) of the `SMBFile` class apart from `path` (and `name`, which is part of `path`) are considered meta data. Meta data of a file or directory are implicitly read, when a file was listed (when it was in the result of `listFiles` or `findFile`), opened (`open`) or closed (`close`), or if it has beed created (using `createDirectory` or `createDirectories`). Meta data are not live data and they are not updated automatically. You can check if the meta data was already read for an instance of `SMBFile` with the `hasStatus` property. The property `statusTime` returns the date the meta data was last read (or nil if it was never read). 
 
 To explicitly read or update a file's meta data use `updateStatus:`:
 
@@ -235,9 +235,7 @@ You need to open a file before you can read from or write to it:
 }]; 
 ```
 
-Use `SMBFileModeRead` if you only want to read from a file. Use `SMBFileModeReadWrite` if you want to write to a file (even if you think that you might not require to read it).
-
-If you open a file in order to write to it, it will be created if it doesn't exist.
+Use `SMBFileModeRead` if you only want to read from a file. Use `SMBFileModeReadWrite` if you want to write to a file (even if you think that you might not require to read it). If you open a file in order to write to it, it will be created if it doesn't exist.
 
 Don't forget to `close:` the file once you're done with it.
 
