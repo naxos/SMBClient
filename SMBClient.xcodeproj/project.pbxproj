@@ -37,8 +37,8 @@
 		452A28251CF89F01004456E5 /* smb_stat.h in Headers */ = {isa = PBXBuildFile; fileRef = 452A28181CF89F01004456E5 /* smb_stat.h */; };
 		452A28261CF89F01004456E5 /* smb_types.h in Headers */ = {isa = PBXBuildFile; fileRef = 452A28191CF89F01004456E5 /* smb_types.h */; };
 		452A28271CF89F01004456E5 /* libdsm.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 452A281A1CF89F01004456E5 /* libdsm.a */; };
-		452A28281CF89F01004456E5 /* libtasn1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 452A281B1CF89F01004456E5 /* libtasn1.a */; };
 		452A282A1CF89F27004456E5 /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 452A28291CF89F27004456E5 /* libiconv.tbd */; };
+		452A28301CFCA571004456E5 /* libtasn1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 452A282F1CFCA571004456E5 /* libtasn1.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,10 +85,10 @@
 		452A28181CF89F01004456E5 /* smb_stat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = smb_stat.h; sourceTree = "<group>"; };
 		452A28191CF89F01004456E5 /* smb_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = smb_types.h; sourceTree = "<group>"; };
 		452A281A1CF89F01004456E5 /* libdsm.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libdsm.a; sourceTree = "<group>"; };
-		452A281B1CF89F01004456E5 /* libtasn1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libtasn1.a; sourceTree = "<group>"; };
 		452A28291CF89F27004456E5 /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
 		452A282B1CF97507004456E5 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		452A282D1CFAE786004456E5 /* COPYING.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = COPYING.md; sourceTree = "<group>"; };
+		452A282F1CFCA571004456E5 /* libtasn1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libtasn1.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,8 +97,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				452A282A1CF89F27004456E5 /* libiconv.tbd in Frameworks */,
+				452A28301CFCA571004456E5 /* libtasn1.a in Frameworks */,
 				452A28271CF89F01004456E5 /* libdsm.a in Frameworks */,
-				452A28281CF89F01004456E5 /* libtasn1.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -189,7 +189,7 @@
 			children = (
 				452A280E1CF89F01004456E5 /* bdsm */,
 				452A281A1CF89F01004456E5 /* libdsm.a */,
-				452A281B1CF89F01004456E5 /* libtasn1.a */,
+				452A282F1CFCA571004456E5 /* libtasn1.a */,
 			);
 			path = libdsm;
 			sourceTree = "<group>";
@@ -536,6 +536,7 @@
 				452A27E91CF89E65004456E5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		452A27EA1CF89E65004456E5 /* Build configuration list for PBXNativeTarget "SMBClientTests" */ = {
 			isa = XCConfigurationList;
@@ -544,6 +545,7 @@
 				452A27EC1CF89E65004456E5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
