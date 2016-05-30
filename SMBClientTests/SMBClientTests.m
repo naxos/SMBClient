@@ -239,18 +239,20 @@ static NSString *password = nil;
                 
                 if (error == nil) {
                     
+                    const NSUInteger bufferSize = 4;
                     NSData *data = [@"Hello world!\n" dataUsingEncoding:NSUTF8StringEncoding];
                     
                     [file write:^NSData *(unsigned long long offset) {
                         if (offset < data.length) {
-                            return [data subdataWithRange:NSMakeRange(offset, MIN(4, data.length - offset))];
+                            return [data subdataWithRange:NSMakeRange(offset, MIN(bufferSize, data.length - offset))];
                         } else {
                             return nil;
                         }
                     } progress:^(unsigned long long bytesWrittenTotal, long bytesWrittenLast, BOOL complete, NSError *error) {
                         XCTAssert(error == nil, @"Error: %@", error);
                         
-                        NSLog(@"Wrote %ld bytes, in total %llu bytes (%0.2f %%)", bytesWrittenLast, bytesWrittenTotal, (double)bytesWrittenTotal / data.length * 100);
+                        NSLog(@"Wrote %ld bytes, in total %llu bytes (%0.2f %%)",
+                              bytesWrittenLast, bytesWrittenTotal, (double)bytesWrittenTotal / data.length * 100);
                         
                         if (complete) {
                             
@@ -284,13 +286,16 @@ static NSString *password = nil;
                 
                 if (error == nil) {
                     
+                    const NSUInteger bufferSize = 3;
                     NSMutableData *result = [NSMutableData new];
                     
-                    [file read:3 progress:^(unsigned long long bytesReadTotal, NSData * _Nullable data, BOOL complete, NSError * _Nullable error) {
+                    [file read:bufferSize
+                      progress:^(unsigned long long bytesReadTotal, NSData * _Nullable data, BOOL complete, NSError * _Nullable error) {
                         
                         XCTAssert(error == nil, @"Error: %@", error);
                         
-                        NSLog(@"Read %ld bytes, in total %llu bytes (%0.2f %%)", data.length, bytesReadTotal, (double)bytesReadTotal / file.size * 100);
+                        NSLog(@"Read %ld bytes, in total %llu bytes (%0.2f %%)",
+                              data.length, bytesReadTotal, (double)bytesReadTotal / file.size * 100);
                         
                         if (data) {
                             [result appendData:data];

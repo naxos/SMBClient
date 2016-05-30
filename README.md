@@ -240,16 +240,20 @@ Don't forget to `close:` the file once you're done with it.
 
 ### Reading files
 
+Here is how you read (download) a file. Obviously, in a real-life situation you probably wouldn't collect all data read in memory. Note, how you are informed about the progress, which makes it easy to e.g. update a progress bar in the user interface.
+
 ```objectivec
 NSUInteger bufferSize = 12000;
 NSMutableData *result = [NSMutableData new];
 
-[file read:bufferSize progress:^(unsigned long long bytesReadTotal, NSData *data, BOOL complete, NSError *error) {
+[file read:bufferSize 
+  progress:^(unsigned long long bytesReadTotal, NSData *data, BOOL complete, NSError *error) {
 
 	if (error) {
 		NSLog(@"Unable to read from the file: %@", error);
 	} else {	
-		NSLog(@"Read %ld bytes, in total %llu bytes (%0.2f %%)", data.length, bytesReadTotal, (double)bytesReadTotal / file.size * 100);
+		NSLog(@"Read %ld bytes, in total %llu bytes (%0.2f %%)", 
+		      data.length, bytesReadTotal, (double)bytesReadTotal / file.size * 100);
 	
 		if (data) {
 			[result appendData:data];
@@ -257,9 +261,40 @@ NSMutableData *result = [NSMutableData new];
 	}	
 	
 	if (complete) {
-		NSLog(@"Finished reading file");
-	
-		[file close:nil];
+		[file close:^(NSError *error) {
+			NSLog(@"Finished reading file");
+		}];
 	}		
 }];
 ```
+
+### Writing files
+
+Writing (uploading) a file is equally simple:
+
+```objectivec
+NSUInteger bufferSize = 12000;
+NSData *data = [@"Hello world!\n" dataUsingEncoding:NSUTF8StringEncoding];
+
+[file write:^NSData *(unsigned long long offset) {
+	if (offset < data.length) {
+		return [data subdataWithRange:NSMakeRange(offset, MIN(bufferSize, data.length - offset))];
+	} else {
+		return nil;
+	}
+} progress:^(unsigned long long bytesWrittenTotal, long bytesWrittenLast, BOOL complete, NSError *error) {
+	if (error) {
+		NSLog(@"Unable to write to the file: %@", error);
+	} else {	
+    	NSLog(@"Wrote %ld bytes, in total %llu bytes (%0.2f %%)",
+		  bytesWrittenLast, bytesWrittenTotal, (double)bytesWrittenTotal / data.length * 100);
+    }
+	
+	if (complete) {
+		[file close:^(NSError *error) {
+			NSLog(@"Finished writing file");
+		}];
+	}
+}];
+```
+
