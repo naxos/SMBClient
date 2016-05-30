@@ -286,11 +286,11 @@ static NSString *password = nil;
                     
                     NSMutableData *result = [NSMutableData new];
                     
-                    [file read:3 progress:^(unsigned long long bytesTotal, unsigned long long bytesReadTotal, NSData * _Nullable data, BOOL complete, NSError * _Nullable error) {
+                    [file read:3 progress:^(unsigned long long bytesReadTotal, NSData * _Nullable data, BOOL complete, NSError * _Nullable error) {
                         
                         XCTAssert(error == nil, @"Error: %@", error);
                         
-                        NSLog(@"Read %ld bytes, in total %llu bytes (%0.2f %%)", data.length, bytesReadTotal, (double)bytesReadTotal / bytesTotal * 100);
+                        NSLog(@"Read %ld bytes, in total %llu bytes (%0.2f %%)", data.length, bytesReadTotal, (double)bytesReadTotal / file.size * 100);
                         
                         if (data) {
                             [result appendData:data];

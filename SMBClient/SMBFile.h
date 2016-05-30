@@ -61,7 +61,7 @@ typedef NS_OPTIONS(NSUInteger, SMBFileMode) {
 - (void)close:(nullable void (^)(NSError *_Nullable error))completion;
 //- (void)write:(nonnull NSData *)data completion:(nullable void (^)(long bytesWritten, NSError *_Nullable error))completion;
 - (void)write:(nonnull NSData *_Nullable (^)(unsigned long long))dataHandler progress:(nullable void (^)(unsigned long long bytesWrittenTotal, long bytesWrittenLast, BOOL complete, NSError *_Nullable error))progress;
-- (void)read:(NSUInteger)bufferSize progress:(nullable void (^)(unsigned long long bytesTotal, unsigned long long bytesReadTotal, NSData *_Nullable data, BOOL complete, NSError *_Nullable error))progress;
+- (void)read:(NSUInteger)bufferSize progress:(nullable void (^)(unsigned long long bytesReadTotal, NSData *_Nullable data, BOOL complete, NSError *_Nullable error))progress;
 
 - (void)listFiles:(nullable void (^)(NSArray<SMBFile *> *_Nullable files, NSError *_Nullable error))completion;
 - (void)listFilesUsingFilter:(nullable BOOL (^)(SMBFile *_Nonnull file))filter completion:(nullable void (^)(NSArray<SMBFile *> *_Nullable files, NSError *_Nullable error))completion;

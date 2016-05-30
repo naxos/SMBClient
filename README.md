@@ -244,12 +244,12 @@ Don't forget to `close:` the file once you're done with it.
 NSUInteger bufferSize = 12000;
 NSMutableData *result = [NSMutableData new];
 
-[file read:bufferSize progress:^(unsigned long long bytesTotal, unsigned long long bytesReadTotal, NSData *data, BOOL complete, NSError *error) {
+[file read:bufferSize progress:^(unsigned long long bytesReadTotal, NSData *data, BOOL complete, NSError *error) {
 
 	if (error) {
 		NSLog(@"Unable to read from the file: %@", error);
 	} else {	
-		NSLog(@"Read %ld bytes, in total %llu bytes (%0.2f %%)", data.length, bytesReadTotal, (double)bytesReadTotal / bytesTotal * 100);
+		NSLog(@"Read %ld bytes, in total %llu bytes (%0.2f %%)", data.length, bytesReadTotal, (double)bytesReadTotal / file.size * 100);
 	
 		if (data) {
 			[result appendData:data];

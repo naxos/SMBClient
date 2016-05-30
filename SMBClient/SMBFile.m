@@ -153,13 +153,12 @@
     return _fileID > 0;
 }
 
-- (void)read:(NSUInteger)bufferSize progress:(nullable void (^)(unsigned long long, unsigned long long, NSData *data, BOOL, NSError *_Nullable))progress {
+- (void)read:(NSUInteger)bufferSize progress:(nullable void (^)(unsigned long long, NSData *data, BOOL, NSError *_Nullable))progress {
     
     dispatch_async(_serialQueue, ^{
         
         NSError *error = nil;
         BOOL finished = NO;
-        unsigned long long size = self.size;
         unsigned long long bytesReadTotal = 0;
         
         if (self.share.server.smbSession) {
@@ -169,7 +168,7 @@
                 
                 if (progress) {
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        progress(size, bytesReadTotal, nil, finished, error);
+                        progress(bytesReadTotal, nil, finished, error);
                     });
                 }
                 
@@ -189,7 +188,7 @@
                             NSData *data = [NSData dataWithBytes:buf length:bytesRead];
                             
                             dispatch_async(dispatch_get_main_queue(), ^{
-                                progress(size, bytesReadTotal, data, finished, error);
+                                progress(bytesReadTotal, data, finished, error);
                             });
                         }
                     }
@@ -205,7 +204,7 @@
         
         if (progress) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                progress(size, bytesReadTotal, nil, finished, error);
+                progress(bytesReadTotal, nil, finished, error);
             });
         }
     });
