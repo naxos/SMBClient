@@ -270,7 +270,7 @@ NSMutableData *result = [NSMutableData new];
 }];
 ```
 
-Note that there is also a read method where you can specify the maximum number of bytes to read, which is useful if you only want to read a portion of the file. This method will probably be used in combination with the seek method.
+Note that there is also a variant of the `read` method where you can specify the maximum number of bytes to read, which is useful if you only want to read a portion of the file. This method will probably be used in combination with the `seek` method of `SMBFile`.
 
 ### Writing files
 
@@ -302,3 +302,4 @@ NSData *data = [@"Hello world!\n" dataUsingEncoding:NSUTF8StringEncoding];
 }];
 ```
 
+If you want to append data to an existing file, or if you want to write at a particular position, you can use the `seek` method of `SMBFile` to position the file pointer.
