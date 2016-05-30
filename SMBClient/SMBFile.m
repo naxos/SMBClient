@@ -106,15 +106,9 @@
 }
 
 - (void)open:(SMBFileMode)mode completion:(nullable void (^)(NSError *_Nullable))completion {
-/*    NSString *queueName = [NSString stringWithFormat:@"smb_file_queue_%@", _path];
 
-    if (_serialQueue == nil) {
-        _serialQueue = dispatch_queue_create(queueName.UTF8String, DISPATCH_QUEUE_SERIAL);
-    }
-  */
-    NSLog(@"------- Queuing open file on file queue");
     dispatch_async(_serialQueue, ^{
-        NSLog(@"------- open file on file queue");
+    
         [self.share openFile:self.path mode:mode completion:^(SMBFile *file, smb_fd fileID, NSError *error) {
             if (error == nil) {
                 _fileID = fileID;
@@ -122,7 +116,6 @@
             }
             if (completion) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    NSLog(@"------------- OPEN COMPLETED %@ %d %@ --------------", self.path, _fileID, error);
                     completion(error);
                 });
             }
@@ -132,12 +125,11 @@
 }
 
 - (void)close:(nullable void (^)(NSError *_Nullable))completion {
-    NSLog(@"------- Queuing close file on file queue");
+
     dispatch_async(_serialQueue, ^{
-        NSLog(@"------- close file on file queue");
+
         if (_fileID == 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSLog(@"------------- CLOSE COMPLETED %@ --------------", self.path);
                 completion([SMBError notOpenError]);
             });
         } else {
@@ -148,7 +140,6 @@
                 }
                 if (completion) {
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        NSLog(@"------------- CLOSE COMPLETED %@ %d --------------", self.path, _fileID);
                         completion(error);
                     });
                 }
