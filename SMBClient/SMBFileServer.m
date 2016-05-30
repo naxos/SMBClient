@@ -58,59 +58,61 @@
 }
 
 - (void)connectAsUser:(NSString *)username password:(NSString *)password completion:(void (^)(BOOL, NSError *))completion {
-    [self disconnect:nil];
-    
-    dispatch_async(_serialQueue, ^{
-        
-        const char *name = self.netbiosName.UTF8String;
-        const char *host = self.host.UTF8String;
-        const char *user = username.length > 0 ? username.UTF8String : " ";
-        const char *pass = password.length > 0 ? password.UTF8String : " ";
-        NSError *error = nil;
-        BOOL guest = NO;
-        const struct hostent *host_entry = gethostbyname(host);
-        
-        if (host_entry == NULL) {
-            error = [SMBError hostNotFoundError];
-        } else if (host_entry->h_addr_list[0] == NULL) {
-            error = [SMBError noIPAddressError];
-        } else {
+    [self disconnect:^{
+
+        dispatch_async(_serialQueue, ^{
             
-            _smbSession = smb_session_new();
+            const char *name = self.netbiosName.UTF8String;
+            const char *host = self.host.UTF8String;
+            const char *user = username.length > 0 ? username.UTF8String : " ";
+            const char *pass = password.length > 0 ? password.UTF8String : " ";
+            NSError *error = nil;
+            BOOL guest = NO;
+            const struct hostent *host_entry = gethostbyname(host);
             
-            if (_smbSession) {
-                const struct in_addr addr = *(struct in_addr *)host_entry->h_addr_list[0];
+            if (host_entry == NULL) {
+                error = [SMBError hostNotFoundError];
+            } else if (host_entry->h_addr_list[0] == NULL) {
+                error = [SMBError noIPAddressError];
+            } else {
                 
-                smb_session_set_creds(_smbSession, name, user, pass);
+                _smbSession = smb_session_new();
                 
-                // Connect to the host
-                int result = smb_session_connect(_smbSession, name, addr.s_addr, SMB_TRANSPORT_TCP);
-                
-                if (result == 0) {
-                    // Login
-                    result = smb_session_login(_smbSession);
-                }
-                
-                if (result == 0) {
-                    if (smb_session_is_guest(_smbSession) > 0) {
-                        guest = YES;
+                if (_smbSession) {
+                    const struct in_addr addr = *(struct in_addr *)host_entry->h_addr_list[0];
+                    
+                    smb_session_set_creds(_smbSession, name, user, pass);
+                    
+                    // Connect to the host
+                    int result = smb_session_connect(_smbSession, name, addr.s_addr, SMB_TRANSPORT_TCP);
+                    
+                    if (result == 0) {
+                        // Login
+                        result = smb_session_login(_smbSession);
+                    }
+                    
+                    if (result == 0) {
+                        if (smb_session_is_guest(_smbSession) > 0) {
+                            guest = YES;
+                        }
+                    } else {
+                        error = [SMBError dsmError:result session:_smbSession];
+                        
+                        [self disconnect:nil];
                     }
                 } else {
-                    error = [SMBError dsmError:result session:_smbSession];
-                    
-                    [self disconnect:nil];
+                    error = [SMBError unknownError];
                 }
-            } else {
-                error = [SMBError unknownError];
             }
-        }
-        
-        if (completion) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completion(guest, error);
-            });
-        }
-    });
+            
+            if (completion) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completion(guest, error);
+                });
+            }
+        });
+    }];
+    
 }
 
 - (void)disconnect:(nullable void (^)())completion {

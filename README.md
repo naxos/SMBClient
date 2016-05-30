@@ -71,7 +71,7 @@ List the shares on a file server:
 ```objectivec
 [fileServer listShares:^(NSArray<SMBShare *> *shares, NSError *error) {
 	if (error) {
-		NSLog(@"Unable to connect: %@", error);
+		NSLog(@"Unable to list the shares: %@", error);
 	} else {
 		for (SMBShare *share in shares) {
 			NSLog(@"Got share: %@", share.name);
@@ -85,7 +85,7 @@ Or, if you already know the name of a share you want to use:
 ```objectivec
 [fileServer findShare:@"Guest Share" completion:^(SMBShare *share, NSError *error) {
 	if (error) {
-		NSLog(@"Unable to find share: %@", error);
+		NSLog(@"Unable to find the share: %@", error);
 	} else {
 		NSLog(@"Got share: %@", share.name);
 	}
@@ -106,7 +106,7 @@ You need to open a share to be able to work on it:
 
 Don't forget to `close:` the share, once you're done.
 
-### List files
+### Listing files
 
 You have two options to list the files on an open share. Either use `listFiles:` on the share instance:
 
@@ -154,7 +154,7 @@ This brings us to the meta data of files.
 
 ### Meta data
 
-All properties (including `isDirectory` and `exists`) of the `SMBFile` class apart from `path` (and `name`, which is part of `path`) are considered meta data. Meta data are read, when a file is being listed, opened or closed. Meta data are not updated automatically and they are not live data. You can check if the meta data was already read for an instance of `SMBFile` with the `hasStatus` property. The property `statusTime` returns the date the meta data was last read (or nil if it was never read). 
+All properties (including `isDirectory` and `exists`) of the `SMBFile` class apart from `path` (and `name`, which is part of `path`) are considered meta data. Meta data are read, when a file is being listed, opened or closed. Meta data are not live data and they are not updated automatically. You can check if the meta data was already read for an instance of `SMBFile` with the `hasStatus` property. The property `statusTime` returns the date the meta data was last read (or nil if it was never read). 
 
 To explicitly read or update a file's meta data use `updateStatus:`:
 
@@ -174,3 +174,92 @@ SMBFile *file = [SMBFile fileWithPath:@"/a/test.txt" share:share];
 }];
 ```
 
+### Deleting files and directories
+
+You can delete files and directories if you have the permission. Directories need to be empty before they can be deleted.
+
+```objectivec
+[file delete:^(NSError *error) {
+	if (error) {
+		NSLog(@"Unable to delete file: %@", error);
+	} else {
+		NSLog(@"File deleted");
+	}
+}];
+```
+
+### Creating directories
+
+This is how you create the directory c as a subdirectory of b:
+
+```objectivec
+SMBFile *file = [SMBFile fileWithPath:@"/a/b/c" share:share];
+
+[file createDirectory:^(NSError *error) {
+	if (error) {
+		NSLog(@"Unable to create the directory: %@", error);
+	} else {
+		NSLog(@"Directory created");
+	}
+}];
+```
+
+The code above will create directory c only, if directory b (and a) already exists. If you want intermediate directories to be created automatically use `createDirectories:`:
+
+```objectivec
+SMBFile *file = [SMBFile fileWithPath:@"/a/b/c" share:share];
+
+[file createDirectories:^(NSError *error) {
+	if (error) {
+		NSLog(@"Unable to create the directory: %@", error);
+	} else {
+		NSLog(@"Directory created");
+	}
+}];
+```
+
+### Opening files
+
+You need to open a file before you can read from or write to it:
+
+```objectivec
+[file open:SMBFileModeRead completion:^(NSError *error) {
+	if (error) {
+		NSLog(@"Unable to open the file: %@", error);
+	} else {
+		NSLog(@"File opened: %@", file.name);
+	}
+}]; 
+```
+
+Use `SMBFileModeRead` if you only want to read from a file. Use `SMBFileModeReadWrite` if you want to write to a file (even if you think that you might not require to read it).
+
+If you open a file in order to write to it, it will be created if it doesn't exist.
+
+Don't forget to `close:` the file once you're done with it.
+
+### Reading files
+
+```objectivec
+NSUInteger bufferSize = 12000;
+NSMutableData *result = [NSMutableData new];
+
+[file read:bufferSize progress:^(unsigned long long bytesTotal, unsigned long long bytesReadTotal, NSData *data, BOOL complete, NSError *error) {
+
+	if (error) {
+		NSLog(@"Unable to read from the file: %@", error);
+	} else {	
+		NSLog(@"Read %ld bytes, in total %llu bytes (%0.2f %%)", data.length, bytesReadTotal, (double)bytesReadTotal / bytesTotal * 100);
+	
+		if (data) {
+			[result appendData:data];
+		}
+	}	
+	
+	if (complete) {
+		NSLog(@"Finished reading file");
+	
+		[file close:nil];
+	}		
+}];
+```
