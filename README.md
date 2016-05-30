@@ -240,14 +240,14 @@ Don't forget to `close:` the file once you're done with it.
 
 ### Reading files
 
-Here is how you read (download) a file. Obviously, in a real-life situation you probably wouldn't collect all data read in memory. Note, how you are informed about the progress, which makes it easy to e.g. update a progress bar in the user interface.
+Here is how you read (download) a file. Obviously, in a real-life situation you probably wouldn't collect all data read in memory. Note, how you are informed about the progress, which makes it easy to e.g. update a progress bar in the user interface. The progress handler may return NO to indicate that the read process should be stopped. Since the progress handler is called asynchronously, this might however not happen instantaneously.
 
 ```objectivec
 NSUInteger bufferSize = 12000;
 NSMutableData *result = [NSMutableData new];
 
 [file read:bufferSize 
-  progress:^(unsigned long long bytesReadTotal, NSData *data, BOOL complete, NSError *error) {
+  progress:^BOOL(unsigned long long bytesReadTotal, NSData *data, BOOL complete, NSError *error) {
 
 	if (error) {
 		NSLog(@"Unable to read from the file: %@", error);
@@ -264,9 +264,13 @@ NSMutableData *result = [NSMutableData new];
 		[file close:^(NSError *error) {
 			NSLog(@"Finished reading file");
 		}];
-	}		
+	}
+	
+	return YES;		
 }];
 ```
+
+Note that there is also a read method where you can specify the maximum number of bytes to read, which is useful if you only want to read a portion of the file. This method will probably be used in combination with the seek method.
 
 ### Writing files
 
@@ -287,7 +291,7 @@ NSData *data = [@"Hello world!\n" dataUsingEncoding:NSUTF8StringEncoding];
 		NSLog(@"Unable to write to the file: %@", error);
 	} else {	
     	NSLog(@"Wrote %ld bytes, in total %llu bytes (%0.2f %%)",
-		  bytesWrittenLast, bytesWrittenTotal, (double)bytesWrittenTotal / data.length * 100);
+		      bytesWrittenLast, bytesWrittenTotal, (double)bytesWrittenTotal / data.length * 100);
     }
 	
 	if (complete) {

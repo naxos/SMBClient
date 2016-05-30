@@ -153,12 +153,50 @@
     return _fileID > 0;
 }
 
-- (void)read:(NSUInteger)bufferSize progress:(nullable void (^)(unsigned long long, NSData *data, BOOL, NSError *_Nullable))progress {
+- (void)seek:(unsigned long long)offset absolute:(BOOL)absolute completion:(nullable void (^)(unsigned long long, NSError *_Nullable))completion {
     
     dispatch_async(_serialQueue, ^{
         
         NSError *error = nil;
-        BOOL finished = NO;
+        unsigned long long position = 0;
+
+        if (self.share.server.smbSession) {
+            if ([self isOpen]) {
+                
+                off_t pos = smb_fseek(self.share.server.smbSession, _fileID, offset, absolute ? SMB_SEEK_SET : SMB_SEEK_CUR);
+                
+                position = MAX(0L, pos);
+                
+                if (pos < 0L) {
+                    error = [SMBError seekError];
+                }
+                
+            } else {
+                error = [SMBError notOpenError];
+            }
+        } else {
+            error = [SMBError notConnectedError];
+        }
+        
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completion(position, error);
+            });
+        }
+
+    });
+}
+
+- (void)read:(NSUInteger)bufferSize progress:(nullable BOOL (^)(unsigned long long, NSData *_Nullable, BOOL, NSError *_Nullable))progress {
+    [self read:bufferSize maxBytes:0 progress:progress];
+}
+
+- (void)read:(NSUInteger)bufferSize maxBytes:(unsigned long long)maxBytes progress:(nullable BOOL (^)(unsigned long long, NSData *_Nullable, BOOL, NSError *_Nullable))progress {
+    
+    dispatch_async(_serialQueue, ^{
+        
+        NSError *error = nil;
+        __block BOOL finished = NO;
         unsigned long long bytesReadTotal = 0;
         
         if (self.share.server.smbSession) {
@@ -168,13 +206,18 @@
                 
                 if (progress) {
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        progress(bytesReadTotal, nil, finished, error);
+                        BOOL readMore = progress(bytesReadTotal, nil, NO, error);
+                        
+                        if (!readMore) {
+                            finished = YES;
+                        }
                     });
                 }
                 
                 while (!finished) {
                     
-                    long bytesRead = smb_fread(self.share.server.smbSession, _fileID, buf, bufferSize);
+                    NSUInteger bytesToRead = maxBytes == 0 ? bufferSize : MIN(bufferSize, maxBytes - bytesReadTotal);
+                    long bytesRead = smb_fread(self.share.server.smbSession, _fileID, buf, bytesToRead);
                     
                     if (bytesRead < 0) {
                         finished = YES;
@@ -184,11 +227,19 @@
                     } else {
                         bytesReadTotal += bytesRead;
                         
+                        if (bytesReadTotal == maxBytes) {
+                            finished = YES;
+                        }
+                        
                         if (progress) {
                             NSData *data = [NSData dataWithBytes:buf length:bytesRead];
                             
                             dispatch_async(dispatch_get_main_queue(), ^{
-                                progress(bytesReadTotal, data, finished, error);
+                                BOOL readMore = progress(bytesReadTotal, data, NO, error);
+                                
+                                if (!readMore) {
+                                    finished = YES;
+                                }
                             });
                         }
                     }
@@ -204,7 +255,7 @@
         
         if (progress) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                progress(bytesReadTotal, nil, finished, error);
+                progress(bytesReadTotal, nil, YES, error);
             });
         }
     });

@@ -275,8 +275,7 @@ static NSString *password = nil;
             
             
             [self waitForExpectationsWithTimeout:5.0 handler:nil];
-            
-            
+
             // ----------------- File read ----------------- //
             
             XCTestExpectation *readExpectation = [self expectationWithDescription:@"File read"];
@@ -290,34 +289,96 @@ static NSString *password = nil;
                     NSMutableData *result = [NSMutableData new];
                     
                     [file read:bufferSize
-                      progress:^(unsigned long long bytesReadTotal, NSData * _Nullable data, BOOL complete, NSError * _Nullable error) {
-                        
+                      progress:^BOOL(unsigned long long bytesReadTotal, NSData * _Nullable data, BOOL complete, NSError * _Nullable error) {
+                          
+                          XCTAssert(error == nil, @"Error: %@", error);
+                          
+                          NSLog(@"Read %ld bytes, in total %llu bytes (%0.2f %%)",
+                                data.length, bytesReadTotal, (double)bytesReadTotal / file.size * 100);
+                          
+                          if (data) {
+                              [result appendData:data];
+                          }
+                          
+                          if (complete) {
+                              
+                              NSString *s = [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
+                              
+                              XCTAssert([s isEqualToString:@"Hello world!\n"], @"Unexpected result");
+                              
+                              NSLog(@"Result: %@", s);
+                              
+                              [file close:^(NSError *error) {
+                                  [readExpectation fulfill];
+                                  
+                                  XCTAssert(error == nil, @"Error: %@", error);
+                              }];
+                          }
+                          
+                          return YES;
+                      }];
+                    
+                } else {
+                    [readExpectation fulfill];
+                }
+            }];
+            
+            [self waitForExpectationsWithTimeout:5.0 handler:nil];
+            
+            
+            // ----------------- File read partial ----------------- //
+            
+            readExpectation = [self expectationWithDescription:@"File read partial"];
+            
+            [file open:SMBFileModeRead completion:^(NSError *error) {
+                XCTAssert(error == nil, @"Error: %@", error);
+                
+                if (error == nil) {
+                    
+                    unsigned long long offset = 3;
+                    unsigned long long maxBytes = 5;
+                
+                    [file seek:offset absolute:YES completion:^(unsigned long long position, NSError *error) {
                         XCTAssert(error == nil, @"Error: %@", error);
                         
-                        NSLog(@"Read %ld bytes, in total %llu bytes (%0.2f %%)",
-                              data.length, bytesReadTotal, (double)bytesReadTotal / file.size * 100);
-                        
-                        if (data) {
-                            [result appendData:data];
+                        if (error == nil) {
+                            const NSUInteger bufferSize = 3;
+                            NSMutableData *result = [NSMutableData new];
+                            
+                            [file read:bufferSize
+                              maxBytes:maxBytes
+                              progress:^BOOL(unsigned long long bytesReadTotal, NSData * _Nullable data, BOOL complete, NSError * _Nullable error) {
+                                  
+                                  XCTAssert(error == nil, @"Error: %@", error);
+                                  
+                                  NSLog(@"Read %ld bytes, in total %llu bytes (%0.2f %%)",
+                                        data.length, bytesReadTotal, (double)bytesReadTotal / file.size * 100);
+                                  
+                                  if (data) {
+                                      [result appendData:data];
+                                  }
+                                  
+                                  if (complete) {
+                                      
+                                      NSString *s = [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
+                                      
+                                      XCTAssert([s isEqualToString:@"lo wo"], @"Unexpected result");
+                                      
+                                      NSLog(@"Result: %@", s);
+                                      
+                                      [file close:^(NSError *error) {
+                                          [readExpectation fulfill];
+                                          
+                                          XCTAssert(error == nil, @"Error: %@", error);
+                                      }];
+                                  }
+                                  
+                                  return YES;
+                              }];
+                        } else {
+                            [readExpectation fulfill];
                         }
-                        
-                        if (complete) {
-                            
-                            NSString *s = [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
-                            
-                            XCTAssert([s isEqualToString:@"Hello world!\n"], @"Unexpected result");
-                            
-                            NSLog(@"Result: %@", s);
-                            
-                            [file close:^(NSError *error) {
-                                [readExpectation fulfill];
-                                
-                                XCTAssert(error == nil, @"Error: %@", error);
-                            }];
-                        }
-                        
                     }];
-                    
                 } else {
                     [readExpectation fulfill];
                 }

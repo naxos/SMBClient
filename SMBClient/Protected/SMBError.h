@@ -34,6 +34,7 @@
 + (NSError *)notOpenError;
 + (NSError *)writeError;
 + (NSError *)readError;
++ (NSError *)seekError;
 + (NSError *)dsmError:(int)dsmError session:(smb_session *)session;
 
 #pragma mark - Unavailable methods

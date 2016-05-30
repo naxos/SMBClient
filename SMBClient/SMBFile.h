@@ -61,7 +61,9 @@ typedef NS_OPTIONS(NSUInteger, SMBFileMode) {
 - (void)close:(nullable void (^)(NSError *_Nullable error))completion;
 //- (void)write:(nonnull NSData *)data completion:(nullable void (^)(long bytesWritten, NSError *_Nullable error))completion;
 - (void)write:(nonnull NSData *_Nullable (^)(unsigned long long))dataHandler progress:(nullable void (^)(unsigned long long bytesWrittenTotal, long bytesWrittenLast, BOOL complete, NSError *_Nullable error))progress;
-- (void)read:(NSUInteger)bufferSize progress:(nullable void (^)(unsigned long long bytesReadTotal, NSData *_Nullable data, BOOL complete, NSError *_Nullable error))progress;
+- (void)read:(NSUInteger)bufferSize progress:(nullable BOOL (^)(unsigned long long bytesReadTotal, NSData *_Nullable data, BOOL complete, NSError *_Nullable error))progress;
+- (void)read:(NSUInteger)bufferSize maxBytes:(unsigned long long)maxBytes progress:(nullable BOOL (^)(unsigned long long bytesReadTotal, NSData *_Nullable data, BOOL complete, NSError *_Nullable error))progress;
+- (void)seek:(unsigned long long)offset absolute:(BOOL)absolute completion:(nullable void (^)(unsigned long long position, NSError *_Nullable error))completion;
 
 - (void)listFiles:(nullable void (^)(NSArray<SMBFile *> *_Nullable files, NSError *_Nullable error))completion;
 - (void)listFilesUsingFilter:(nullable BOOL (^)(SMBFile *_Nonnull file))filter completion:(nullable void (^)(NSArray<SMBFile *> *_Nullable files, NSError *_Nullable error))completion;

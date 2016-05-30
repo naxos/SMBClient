@@ -54,6 +54,10 @@
     return [NSError errorWithDomain:@"smb.error" code:56 userInfo:@{ NSLocalizedDescriptionKey : @"Unable to read from file"} ];
 }
 
++ (NSError *)seekError {
+    return [NSError errorWithDomain:@"smb.error" code:57 userInfo:@{ NSLocalizedDescriptionKey : @"Unable to seek position in file"} ];
+}
+
 + (NSError *)dsmError:(int)dsmError session:(smb_session *)session {
     NSString *domain = @"dsm.error";
     NSError *error = nil;
