@@ -65,6 +65,8 @@ Be it through discovery or direct instantiation, once you have a file server, yo
 }];
 ```
 
+Don't forget to `disconnect:` from the server when you are finished.
+
 ### Shares
 
 List the shares on a file server:
