@@ -8,7 +8,7 @@
 * List file shares
 * List/create/delete directories
 * Read file meta data
-* Create/read/write files
+* Read/write/delete files
 * Seek/read partial
 
 ## Examples
