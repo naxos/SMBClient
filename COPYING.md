@@ -1,22 +1,11 @@
 # SMBClient License
-`SMBClient` is dual-licensed under both the MIT License, and the LGPL v2.1 (or later) License.
-
-This means that it is up to you, to choose the license appropriate for you. Normally your choice will depend on your choice of license for `libdsm`. The `libdsm` library is available under LGPL v2.1 (or later) or a commercial license. If you are using `libdsm` under the LGPL, `SMBClient` is available under the same license. If you have a commercial license for libdsm, you might want to choose the MIT license for this library.
-
-## The MIT License
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+`SMBClient` is licensed under the GNU Lesser General Public License version 2.1
+or later.
 
 ## The GNU Lesser General Public License, version 2.1 (LGPL-2.1)
 _Version 2.1, February 1999_  
 _Copyright © 1991, 1999 Free Software Foundation, Inc._  
 _51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA_
-
-Everyone is permitted to copy and distribute verbatim copies
-of this license document, but changing it is not allowed.
 
 _This is the first released version of the Lesser GPL.  It also counts
 as the successor of the GNU Library Public License, version 2, hence

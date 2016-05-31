@@ -4,8 +4,8 @@
 //
 // Author: Martin Schaefer <martin.schaefer@naxos-software.de>
 //
-// SMBClient is dual-licensed under both the MIT License, and the
-// LGPL v2.1 (or later) License.
+// SMBClient is licensed under the GNU Lesser General Public License version 2.1
+// or later
 // -----------------------------------------------------------------------------
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
