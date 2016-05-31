@@ -29,7 +29,7 @@
 
 @interface SMBShare : NSObject
 
-@property (nonatomic, readonly, nullable) SMBFileServer *server;
+@property (nonatomic, readonly, nonnull) SMBFileServer *server;
 @property (nonatomic, readonly, nonnull) NSString *name;
 @property (nonatomic, readonly) BOOL isOpen;
 
