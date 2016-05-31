@@ -3,7 +3,7 @@
 
 `SMBClient` relies on [libdsm](http://videolabs.github.io/libdsm), a low level SMB client library written in C and [libtasn1](https://www.gnu.org/software/libtasn1/), an implementation of the Abstract Syntax Notification ASN.1. Binaries and headers of both libraries are embedded in this library to eliminate external dependencies. The version of `SMBClient` is (currently) tied to the version of `libdsm` included in this library. 
 
-`SMBClient` as well as `libdsm` and `libtasn1` are licensed under the [GNU Lesser General Public License version 2.1](https://www.gnu.org/licenses/lgpl-2.1.html) or later. A commercial license option is available for `libdsm`.
+`SMBClient` as well as `libdsm` and `libtasn1` are licensed under the [GNU Lesser General Public License version 2.1](https://www.gnu.org/licenses/lgpl-2.1.html) or later. A commercial license option is available for `libdsm`. [Contact](mailto:info@naxos-software.de) us if you require a license of `SMBClient` to be used with the comercial license of `libdsm`.
 
 ## Features
 * Discover SMB devices on your network
