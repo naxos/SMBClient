@@ -1,9 +1,9 @@
 # SMBClient
 `SMBClient` is a small dynamic library that allows iOS apps to access SMB/CIFS file servers. `SMBClient` is written in Objective C. The library supports the discovery of SMB devices and shares, listing and managing directories, reading meta data as well as reading and writing files. All functions are implemented in an asynchronous manner, to allow for a fluid user interface.
 
-`SMBClient` relies on [libdsm](http://videolabs.github.io/libdsm), a low level SMB client library written in C and [libtasn1](https://www.gnu.org/software/libtasn1/), an implementation of the Abstract Syntax Notification ASN.1. Binaries and headers of both libraries are embedded in this library to eliminate external dependencies.
+`SMBClient` relies on [libdsm](http://videolabs.github.io/libdsm), a low level SMB client library written in C and [libtasn1](https://www.gnu.org/software/libtasn1/), an implementation of the Abstract Syntax Notification ASN.1. Binaries and headers of both libraries are embedded in this library to eliminate external dependencies. The version of `SMBClient` is (currently) tied to the version of `libdsm` included in this library. 
 
-`SMBClient` as well as `libdsm` and `libtasn1` are licensed under the [GNU Lesser General Public License version 2.1](https://www.gnu.org/licenses/lgpl-2.1.html) (LGPLv2.1) or later. A commercial license option is available for `libdsm`.
+`SMBClient` as well as `libdsm` and `libtasn1` are licensed under the [GNU Lesser General Public License version 2.1](https://www.gnu.org/licenses/lgpl-2.1.html) or later. A commercial license option is available for `libdsm`.
 
 ## Features
 * Discover SMB devices on your network
@@ -243,7 +243,7 @@ Don't forget to `close:` the file once you're done with it.
 
 ### Reading files
 
-Here is how you read (download) a file. Obviously, in a real-life situation you probably wouldn't collect all data read in memory. Note, how you are informed about the progress, which makes it easy to e.g. update a progress bar in the user interface. The progress handler may return NO to indicate that the read process should be stopped. Since the progress handler is called asynchronously, this might however not happen instantaneously.
+Here is how you read (download) a file. Obviously, in a real-life situation you probably wouldn't collect all data in memory. Note, how you are informed about the progress, which makes it easy to e.g. update a progress bar in the user interface. The progress handler may return NO to indicate that the read process should be stopped. Since the progress handler is called asynchronously, this might however not happen instantaneously.
 
 ```objectivec
 NSUInteger bufferSize = 12000;
