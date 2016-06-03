@@ -310,3 +310,4 @@ If you want to append data to an existing file, or if you want to write at a par
 ##License
 
 `SMBClient` as well as `libdsm` and `libtasn1` are licensed under the [GNU Lesser General Public License version 2.1](https://www.gnu.org/licenses/lgpl-2.1.html) or later. See the [LICENSE file](LICENSE.md). A commercial license option is available for `libdsm`. [Contact](mailto:info@naxos-software.de) us if you require a license of `SMBClient` to be used with the commercial license of `libdsm`.
+
