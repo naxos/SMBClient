@@ -88,7 +88,7 @@
 		452A285C1CFCAA70004456E5 /* libdsm-iOS.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libdsm-iOS.a"; sourceTree = "<group>"; };
 		452A28601CFCAA70004456E5 /* libtasn1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libtasn1.h; sourceTree = "<group>"; };
 		452A28611CFCAA70004456E5 /* libtasn1-iOS.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libtasn1-iOS.a"; sourceTree = "<group>"; };
-		452A28721CFF2FC9004456E5 /* LICENSE.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
+		452A288E1D00113E004456E5 /* LICENSE.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,7 +116,7 @@
 		452A27C91CF89E65004456E5 = {
 			isa = PBXGroup;
 			children = (
-				452A28721CFF2FC9004456E5 /* LICENSE.md */,
+				452A288E1D00113E004456E5 /* LICENSE.md */,
 				452A282B1CF97507004456E5 /* README.md */,
 				452A28291CF89F27004456E5 /* libiconv.tbd */,
 				452A280C1CF89F01004456E5 /* ThirdParty */,
