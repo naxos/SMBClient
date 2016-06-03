@@ -216,7 +216,7 @@
                 
                 while (!finished) {
                     
-                    NSUInteger bytesToRead = maxBytes == 0 ? bufferSize : MIN(bufferSize, maxBytes - bytesReadTotal);
+                    NSUInteger bytesToRead = maxBytes == 0 ? bufferSize : MIN(bufferSize, (NSUInteger)(maxBytes - bytesReadTotal));
                     long bytesRead = smb_fread(self.share.server.smbSession, _fileID, buf, bytesToRead);
                     
                     if (bytesRead < 0) {
