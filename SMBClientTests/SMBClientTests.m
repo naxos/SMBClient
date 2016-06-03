@@ -30,7 +30,7 @@
 
 
 // netbios name, ip address or hostname of the server
-static NSString *host = @"192.168.178.56";
+static NSString *host = @"imac";
 // name of a share on the server
 static NSString *fileShare = @"Guest Share";
 // credentials of a user with write access to the share,
@@ -66,7 +66,7 @@ static NSString *password = nil;
     BOOL ok = [[SMBDiscovery sharedInstance] startDiscoveryOfType:SMBDeviceTypeFileServer added:^(SMBDevice *device) {
         NSLog(@"Device added: %@", device);
         
-        if ([device.netbiosName isEqualToString:host] || [device.host isEqualToString:host]) {
+        if ([device.netbiosName caseInsensitiveCompare:host] == NSOrderedSame || [device.host caseInsensitiveCompare:host] == NSOrderedSame) {
             server = (SMBFileServer *)device;
             
             [discoveryExpectation fulfill];
@@ -244,7 +244,7 @@ static NSString *password = nil;
                     
                     [file write:^NSData *(unsigned long long offset) {
                         if (offset < data.length) {
-                            return [data subdataWithRange:NSMakeRange(offset, MIN(bufferSize, data.length - offset))];
+                            return [data subdataWithRange:NSMakeRange((NSUInteger)offset, (NSUInteger)MIN(bufferSize, data.length - offset))];
                         } else {
                             return nil;
                         }
@@ -293,7 +293,7 @@ static NSString *password = nil;
                           
                           XCTAssert(error == nil, @"Error: %@", error);
                           
-                          NSLog(@"Read %ld bytes, in total %llu bytes (%0.2f %%)",
+                          NSLog(@"Read %lu bytes, in total %llu bytes (%0.2f %%)",
                                 data.length, bytesReadTotal, (double)bytesReadTotal / file.size * 100);
                           
                           if (data) {
@@ -351,7 +351,7 @@ static NSString *password = nil;
                                   
                                   XCTAssert(error == nil, @"Error: %@", error);
                                   
-                                  NSLog(@"Read %ld bytes, in total %llu bytes (%0.2f %%)",
+                                  NSLog(@"Read %lu bytes, in total %llu bytes (%0.2f %%)",
                                         data.length, bytesReadTotal, (double)bytesReadTotal / file.size * 100);
                                   
                                   if (data) {
