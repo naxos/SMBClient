@@ -6,6 +6,21 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		452A28F51D02FB01004456E5 /* Universal Framework */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 452A28F81D02FB01004456E5 /* Build configuration list for PBXAggregateTarget "Universal Framework" */;
+			buildPhases = (
+				452A28FB1D02FB15004456E5 /* Build & Lipo */,
+			);
+			dependencies = (
+				452A28FA1D02FB0E004456E5 /* PBXTargetDependency */,
+			);
+			name = "Universal Framework";
+			productName = "Universal Framework";
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		452A27D71CF89E65004456E5 /* SMBClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 452A27D61CF89E65004456E5 /* SMBClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		452A27DE1CF89E65004456E5 /* SMBClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 452A27D31CF89E65004456E5 /* SMBClient.framework */; };
@@ -43,6 +58,13 @@
 
 /* Begin PBXContainerItemProxy section */
 		452A27DF1CF89E65004456E5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 452A27CA1CF89E65004456E5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 452A27D21CF89E65004456E5;
+			remoteInfo = SMBClient;
+		};
+		452A28F91D02FB0E004456E5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 452A27CA1CF89E65004456E5 /* Project object */;
 			proxyType = 1;
@@ -313,6 +335,9 @@
 					452A27DC1CF89E65004456E5 = {
 						CreatedOnToolsVersion = 7.3.1;
 					};
+					452A28F51D02FB01004456E5 = {
+						CreatedOnToolsVersion = 7.3.1;
+					};
 				};
 			};
 			buildConfigurationList = 452A27CD1CF89E65004456E5 /* Build configuration list for PBXProject "SMBClient" */;
@@ -329,6 +354,7 @@
 			targets = (
 				452A27D21CF89E65004456E5 /* SMBClient */,
 				452A27DC1CF89E65004456E5 /* SMBClientTests */,
+				452A28F51D02FB01004456E5 /* Universal Framework */,
 			);
 		};
 /* End PBXProject section */
@@ -349,6 +375,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		452A28FB1D02FB15004456E5 /* Build & Lipo */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Build & Lipo";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Adopted from: http://stackoverflow.com/questions/24039470/xcode-6-ios-creating-a-cocoa-touch-framework-architectures-issues (user3437673)\n# Added OTHER_CFLAGS=\"-fembed-bitcode\" to force bitcode generation\n\nUNIVERSAL_OUTPUTFOLDER=${BUILD_DIR}/${CONFIGURATION}-universal\n\n# make sure the output directory exists\nmkdir -p \"${UNIVERSAL_OUTPUTFOLDER}\"\n\n# Step 1. Build Device and Simulator versions\nxcodebuild -target \"${PROJECT_NAME}\" ONLY_ACTIVE_ARCH=NO -configuration ${CONFIGURATION} -sdk iphoneos  BUILD_DIR=\"${BUILD_DIR}\" BUILD_ROOT=\"${BUILD_ROOT}\" OTHER_CFLAGS=\"-fembed-bitcode\" clean build\nxcodebuild -target \"${PROJECT_NAME}\" ONLY_ACTIVE_ARCH=NO -configuration ${CONFIGURATION} -sdk iphonesimulator VALID_ARCHS=\"x86_64 i386\" BUILD_DIR=\"${BUILD_DIR}\" BUILD_ROOT=\"${BUILD_ROOT}\" OTHER_CFLAGS=\"-fembed-bitcode\" clean build\n\n# Step 2. Copy the framework structure to the universal folder\ncp -R \"${BUILD_DIR}/${CONFIGURATION}-iphoneos/${PROJECT_NAME}.framework\" \"${UNIVERSAL_OUTPUTFOLDER}/\"\n\n# Step 3. Create universal binary file using lipo and place the combined executable in the copied framework directory\nlipo -create -output \"${UNIVERSAL_OUTPUTFOLDER}/${PROJECT_NAME}.framework/${PROJECT_NAME}\" \"${BUILD_DIR}/${CONFIGURATION}-iphonesimulator/${PROJECT_NAME}.framework/${PROJECT_NAME}\" \"${BUILD_DIR}/${CONFIGURATION}-iphoneos/${PROJECT_NAME}.framework/${PROJECT_NAME}\"\n\n# Step 4. Combine the swift modules\ncp -R \"${BUILD_DIR}/${CONFIGURATION}-iphonesimulator/${PROJECT_NAME}.framework/Modules/${PROJECT_NAME}.swiftmodule/\" \"${UNIVERSAL_OUTPUTFOLDER}/${PROJECT_NAME}.framework/Modules/${PROJECT_NAME}.swiftmodule/\"\n\n# Step 5. Convenience step to copy the framework to the project's directory\ncp -R \"${UNIVERSAL_OUTPUTFOLDER}/${PROJECT_NAME}.framework\" \"${PROJECT_DIR}\"\n\n# Step 6. Delete temporary build directory in the project's directory\nrm -rf \"${PROJECT_DIR}/build\"\n\n# Step 7. Convenience step to open the project's directory in Finder\nopen \"${PROJECT_DIR}\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		452A27CE1CF89E65004456E5 /* Sources */ = {
@@ -379,6 +422,11 @@
 			isa = PBXTargetDependency;
 			target = 452A27D21CF89E65004456E5 /* SMBClient */;
 			targetProxy = 452A27DF1CF89E65004456E5 /* PBXContainerItemProxy */;
+		};
+		452A28FA1D02FB0E004456E5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 452A27D21CF89E65004456E5 /* SMBClient */;
+			targetProxy = 452A28F91D02FB0E004456E5 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -537,6 +585,20 @@
 			};
 			name = Release;
 		};
+		452A28F61D02FB01004456E5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		452A28F71D02FB01004456E5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -566,6 +628,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		452A28F81D02FB01004456E5 /* Build configuration list for PBXAggregateTarget "Universal Framework" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				452A28F61D02FB01004456E5 /* Debug */,
+				452A28F71D02FB01004456E5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};
