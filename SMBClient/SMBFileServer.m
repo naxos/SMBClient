@@ -138,7 +138,7 @@
         
         if (error == nil) {
             for (SMBShare *s in shares) {
-                if ([s.name isEqualToString:name]) {
+                if ([s.name caseInsensitiveCompare:name] == NSOrderedSame) {
                     share = s;
                     break;
                 }
