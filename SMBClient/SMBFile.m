@@ -96,7 +96,13 @@
 
 - (SMBFile *)parent {
     SMBFile *parent = nil;
-    NSString *path = [self.path stringByDeletingLastPathComponent];
+    NSString *path;
+    
+    if ([self.path isEqualToString:@"/"]) {
+        path = nil;
+    } else {
+        path = [self.path stringByDeletingLastPathComponent];
+    }
     
     if (path.length) {
         parent = [[SMBFile alloc] initWithPath:path share:self.share];
