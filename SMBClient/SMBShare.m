@@ -54,6 +54,7 @@
 }
 
 - (void)dealloc {
+    smb_tree_disconnect(_server.smbSession, _shareID);
 }
 
 - (NSString *)description {

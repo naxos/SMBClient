@@ -78,7 +78,13 @@
 }
 
 - (instancetype)initWithPath:(NSString *)path relativeToFile:(SMBFile *)file {
-    NSURL *url = [NSURL fileURLWithPath:file.path];
+    NSString *p = file.path;
+    
+    if (file.isDirectory) {
+        p = [p stringByAppendingString:@"/"];
+    }
+    
+    NSURL *url = [NSURL fileURLWithPath:p];
     NSString *absolutePath = [NSURL fileURLWithPath:path relativeToURL:url].path;
     
     return [self initWithPath:absolutePath share:file.share];
