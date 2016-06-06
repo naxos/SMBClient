@@ -50,7 +50,6 @@
 }
 
 - (void)dealloc {
-    
     if (_smbSession) {
         smb_session_destroy(_smbSession);
         _smbSession = nil;
