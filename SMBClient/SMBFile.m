@@ -338,7 +338,7 @@
 }
 
 - (void)listFilesUsingFilter:(nullable BOOL (^)(SMBFile *_Nonnull file))filter completion:(nullable void (^)(NSArray<SMBFile *> *_Nullable files, NSError *_Nullable error))completion {
-    if (_smbStat == nil || !self.exists) {
+    //if (_smbStat == nil || !self.exists) {
         [self updateStatus:^(NSError *error) {
             if (error) {
                 if (completion) {
@@ -346,13 +346,17 @@
                         completion(nil, error);
                     });
                 }
+            } else if (!self.hasStatus || !self.isDirectory) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completion(nil, [SMBError notSuchFileOrDirectory]);
+                });
             } else {
                 [self.share listFiles:self.path filter:filter completion:completion];
             }
         }];
-    } else {
-        [self.share listFiles:self.path filter:filter completion:completion];
-    }
+    //} else {
+    //    [self.share listFiles:self.path filter:filter completion:completion];
+    //}
 }
 
 - (void)updateStatus:(nullable void (^)(NSError *_Nullable))completion {

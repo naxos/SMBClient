@@ -58,6 +58,10 @@
     return [NSError errorWithDomain:@"smb.error" code:57 userInfo:@{ NSLocalizedDescriptionKey : @"Unable to seek position in file"} ];
 }
 
++ (NSError *)notSuchFileOrDirectory {
+    return [NSError errorWithDomain:@"smb.error" code:58 userInfo:@{ NSLocalizedDescriptionKey : @"No such file or directory"} ];
+}
+
 + (NSError *)dsmError:(int)dsmError session:(smb_session *)session {
     NSString *domain = @"dsm.error";
     NSError *error = nil;

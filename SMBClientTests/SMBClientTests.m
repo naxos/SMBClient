@@ -155,7 +155,7 @@ static NSString *password = nil;
         XCTAssert(testShare != nil, @"Test share '%@' not found", fileShare);
         
         if (testShare) {
-            
+
             // ----------------- Create directory ----------------- //
             
             XCTestExpectation *createDirExpectation = [self expectationWithDescription:@"Create directory"];
@@ -386,7 +386,6 @@ static NSString *password = nil;
             
             [self waitForExpectationsWithTimeout:5.0 handler:nil];
             
-            
             // ----------------- File status ----------------- //
             
             XCTestExpectation *statusExpectation = [self expectationWithDescription:@"File status"];
@@ -416,10 +415,10 @@ static NSString *password = nil;
                 }
             }];
             
-            [self waitForExpectationsWithTimeout:5.0 handler:nil];
+            [self waitForExpectationsWithTimeout:50.0 handler:nil];
             
             // ----------------- File filter ----------------- //
-            
+
             XCTestExpectation *filterExpectation = [self expectationWithDescription:@"File filter"];
             NSString *fileName = @"a";
             

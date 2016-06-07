@@ -32,6 +32,7 @@
 + (NSError *)noIPAddressError;
 + (NSError *)notConnectedError;
 + (NSError *)notOpenError;
++ (NSError *)notSuchFileOrDirectory;
 + (NSError *)writeError;
 + (NSError *)readError;
 + (NSError *)seekError;
