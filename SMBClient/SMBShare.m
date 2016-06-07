@@ -428,8 +428,6 @@
     // See https://github.com/videolabs/libdsm/issues/79
     
     if (stat == NULL) {
-        
-        NSLog(@"--------------- STATUS is NIL ---------");
         smb_stat_list statList = smb_find(self.server.smbSession, _shareID, path);
         
         if (statList != NULL) {

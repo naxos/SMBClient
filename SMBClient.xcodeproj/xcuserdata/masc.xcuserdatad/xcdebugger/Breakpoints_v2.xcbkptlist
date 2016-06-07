@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SMBClient/SMBShare.m"
-            timestampString = "486987168.763517"
+            timestampString = "487003811.93081"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "471"
-            endingLineNumber = "471"
+            startingLineNumber = "420"
+            endingLineNumber = "420"
             landmarkName = "@implementation SMBShare"
             landmarkType = "3">
          </BreakpointContent>
