@@ -387,6 +387,39 @@
     });
 }
 
+- (void)moveFile:(NSString *)oldPath to:(NSString *)newPath completion:(void (^)(SMBFile *, NSError *))completion {
+    dispatch_async(_serialQueue, ^{
+        NSError *error = nil;
+        SMBFile *file = nil;
+        
+        if (self.server.smbSession) {
+            if ([self isOpen]) {
+                NSString *smbOldPath = [oldPath stringByReplacingOccurrencesOfString:@"/" withString:@"\\"];
+                NSString *smbNewPath = [newPath stringByReplacingOccurrencesOfString:@"/" withString:@"\\"];
+
+                int res = smb_file_mv(self.server.smbSession, _shareID, smbOldPath.UTF8String, smbNewPath.UTF8String);
+                
+                if (res != 0) {
+                    error = [SMBError notSuchFileOrDirectory];
+                } else {
+                    file = [SMBFile fileWithPath:newPath share:self];
+                    file.smbStat = [self _stat:smbNewPath.UTF8String];
+                }
+            } else {
+                error = [SMBError notOpenError];
+            }
+        } else {
+            error = [SMBError notConnectedError];
+        }
+        
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completion(file, error);
+            });
+        }
+    });
+}
+
 - (void)getStatusOfFile:(NSString *)path completion:(void (^)(SMBStat *, NSError *))completion {
 
     if (path.length == 0 || [path isEqualToString:@"/"]) {

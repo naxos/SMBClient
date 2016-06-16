@@ -468,11 +468,27 @@ static NSString *password = nil;
             
             [self waitForExpectationsWithTimeout:5.0 handler:nil];
             
+            // ----------------- Move file ----------------- //
+            
+            XCTestExpectation *moveFileExpectation = [self expectationWithDescription:@"Move file"];
+            
+            file = [[SMBFile alloc] initWithPath:@"/a/test.txt" share:testShare];
+            
+            [file moveTo:@"test1.txt" completion:^(NSError * _Nullable error) {
+                [moveFileExpectation fulfill];
+
+                XCTAssert(error == nil, @"Error: %@", error);
+                
+                XCTAssert(file.exists, @"File does not exist");                
+            }];
+            
+            [self waitForExpectationsWithTimeout:5.0 handler:nil];
+            
             // ----------------- Delete file ----------------- //
             
             XCTestExpectation *deleteFileExpectation = [self expectationWithDescription:@"Delete file"];
             
-            file = [[SMBFile alloc] initWithPath:@"/a/test.txt" share:testShare];
+            file = [[SMBFile alloc] initWithPath:@"/a/test1.txt" share:testShare];
             
             [file updateStatus:^(NSError * _Nullable error) {
                 XCTAssert(error == nil, @"Error: %@", error);

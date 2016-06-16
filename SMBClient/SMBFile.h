@@ -71,6 +71,7 @@ typedef NS_OPTIONS(NSUInteger, SMBFileMode) {
 - (void)createDirectory:(nullable void (^)(NSError *_Nullable error))completion;
 - (void)createDirectories:(nullable void (^)(NSError *_Nullable error))completion;
 - (void)delete:(nullable void (^)(NSError *_Nullable error))completion;
+- (void)moveTo:(nonnull NSString *)path completion:(nullable void (^)(NSError *_Nullable error))completion;
 
 #pragma mark - Unavailable methods
 

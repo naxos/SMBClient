@@ -411,6 +411,22 @@
     }];
 }
 
+- (void)moveTo:(nonnull NSString *)path completion:(nullable void (^)(NSError *_Nullable))completion {
+    SMBFile *f = [SMBFile fileWithPath:path relativeToFile:self];
+    
+    [self.share moveFile:self.path to:f.path completion:^(SMBFile *_Nullable newFile, NSError * _Nullable error) {
+        if (error == nil) {
+            _smbStat = newFile.smbStat;
+            _path = newFile.path;
+        }
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completion(error);
+            });
+        }
+    }];
+}
+
 #pragma mark - Overwritten getters and setters
 
 - (NSString *)name {

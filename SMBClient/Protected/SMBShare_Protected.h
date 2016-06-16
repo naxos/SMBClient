@@ -63,6 +63,7 @@
 - (void)getStatusOfFile:(nonnull NSString *)path completion:(nullable void (^)(SMBStat *_Nullable status, NSError *_Nullable error))completion;
 - (void)createDirectory:(nonnull NSString *)path completion:(nullable void (^)(SMBFile *_Nullable file, NSError *_Nullable error))completion;
 - (void)createDirectories:(nonnull NSString *)path completion:(nullable void (^)(SMBFile *_Nullable file, NSError *_Nullable error))completion;
+- (void)moveFile:(nonnull NSString *)oldPath to:(nonnull NSString *)newPath completion:(nullable void (^)(SMBFile *_Nullable file, NSError *_Nullable error))completion;
 - (void)deleteFile:(nonnull NSString *)path completion:(nullable void (^)(NSError *_Nullable error))completion;
 - (void)openFile:(nonnull NSString *)path mode:(SMBFileMode)mode completion:(nullable void (^)(SMBFile *_Nullable file, smb_fd fd, NSError *_Nullable error))completion;
 - (void)closeFile:(smb_fd)fd path:(nonnull NSString *)path completion:(nullable void (^)(SMBFile *_Nullable file, NSError *_Nullable error))completion;
