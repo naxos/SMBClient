@@ -114,27 +114,27 @@ static SMBDevice *_device(netbios_ns_entry *entry) {
 }
 
 static void _on_entry_added(void *p_opaque, netbios_ns_entry *entry) {
-    if (_addedHandler) {
-        dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (_addedHandler) {
             SMBDevice *device = _device(entry);
             
             if (_typeMask & device.type) {
                 _addedHandler(_device(entry));
             }
-        });
-    }
+        }
+    });
 }
 
 static void _on_entry_removed(void *p_opaque, netbios_ns_entry *entry) {
-    if (_removedHandler) {
-        dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (_removedHandler) {
             SMBDevice *device = _device(entry);
             
             if (_typeMask & device.type) {
                 _removedHandler(_device(entry));
             }
-        });
-    }
+        }
+    });
 }
 
 @end
