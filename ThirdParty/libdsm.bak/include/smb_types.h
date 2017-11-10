@@ -28,20 +28,80 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef __BDSM_H_
-#define __BDSM_H_
+/**
+ * @file smb_types.h
+ * @brief liBDSM types and structures
+ */
 
-#define BDSM_VERSION_CURRENT  4
-#define BDSM_VERSION_REVISION 0
-#define BDSM_VERSION_AGE      1
+#ifndef __BDSM_SMB_TYPES_H_
+#define __BDSM_SMB_TYPES_H_
 
-#include "netbios_ns.h"
-#include "netbios_defs.h"
-#include "smb_types.h"
-#include "smb_session.h"
-#include "smb_share.h"
-#include "smb_file.h"
-#include "smb_stat.h"
-#include "smb_dir.h"
+#include <stddef.h>
+#include <stdint.h>
+
+#define _FILE_OFFSET_BITS 64
+
+#include <libtasn1.h>
+
+#if defined(__ANDROID__)
+# undef  off_t
+# define off_t off64_t
+#endif
+/**
+  * @struct smb_tid
+  * @brief The id of a connection to a share within a session.
+  */
+typedef uint16_t    smb_tid;
+
+/**
+  * @struct smb_fid
+  * @brief The id of a file within a share within a session.
+  */
+typedef uint16_t    smb_fid;
+
+// Concatenation of the two above, representing a file inside of a session
+// First 4 bytes are the TreeID (smb_tid), last 4 are the File ID (FUID)
+// A map between smb_fd and smb_file is maintained inside each session
+/** @struct smb_fd
+  * @brief SMB File descriptor, represents a file within a session.
+  */
+typedef uint32_t    smb_fd;
+
+// An structure to store user credentials;
+// login:password@domain (also DOMAIN\login)
+typedef struct
+{
+    char     *domain;
+    char     *login;
+    char     *password;
+}           smb_creds;
+
+/**
+ * @brief An opaque data structure to represent a SMB Session.
+ */
+typedef struct smb_session smb_session;
+
+/**
+ * @struct smb_share_list
+ * @brief An opaque object representing the list of share of a SMB file server.
+ */
+typedef char  **smb_share_list;
+
+/**
+ * @brief An opaque data structure to represent file
+ */
+typedef struct smb_file smb_file;
+
+/**
+ * @struct smb_stat_list
+ * @brief An opaque structure containing a list of file status
+ */
+typedef smb_file *smb_stat_list;
+
+/**
+ * @struct smb_stat
+ * @brief An opaque structure containing info about a file
+ */
+typedef smb_file *smb_stat;
 
 #endif

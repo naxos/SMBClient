@@ -114,7 +114,7 @@
     
 }
 
-- (void)disconnect:(nullable void (^)())completion {
+- (void)disconnect:(nullable void (^)(void))completion {
     
     dispatch_async(_serialQueue, ^{
         if (_smbSession) {
