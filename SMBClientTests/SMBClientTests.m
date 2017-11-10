@@ -30,7 +30,7 @@
 
 
 // netbios name, ip address or hostname of the server
-static NSString *host = @"192.168.178.56";
+static NSString *host = @"imac";
 // name of a share on the server
 static NSString *fileShare = @"Guest Share";
 // credentials of a user with write access to the share,
@@ -66,7 +66,7 @@ static NSString *password = nil;
     BOOL ok = [[SMBDiscovery sharedInstance] startDiscoveryOfType:SMBDeviceTypeFileServer added:^(SMBDevice *device) {
         NSLog(@"Device added: %@", device);
         
-        if ([device.netbiosName isEqualToString:host] || [device.host isEqualToString:host]) {
+        if ([device.netbiosName caseInsensitiveCompare:host] == NSOrderedSame || [device.host caseInsensitiveCompare:host] == NSOrderedSame) {
             server = (SMBFileServer *)device;
             
             [discoveryExpectation fulfill];
@@ -155,7 +155,7 @@ static NSString *password = nil;
         XCTAssert(testShare != nil, @"Test share '%@' not found", fileShare);
         
         if (testShare) {
-            
+
             // ----------------- Create directory ----------------- //
             
             XCTestExpectation *createDirExpectation = [self expectationWithDescription:@"Create directory"];
@@ -244,7 +244,7 @@ static NSString *password = nil;
                     
                     [file write:^NSData *(unsigned long long offset) {
                         if (offset < data.length) {
-                            return [data subdataWithRange:NSMakeRange(offset, MIN(bufferSize, data.length - offset))];
+                            return [data subdataWithRange:NSMakeRange((NSUInteger)offset, (NSUInteger)MIN(bufferSize, data.length - offset))];
                         } else {
                             return nil;
                         }
@@ -293,7 +293,7 @@ static NSString *password = nil;
                           
                           XCTAssert(error == nil, @"Error: %@", error);
                           
-                          NSLog(@"Read %ld bytes, in total %llu bytes (%0.2f %%)",
+                          NSLog(@"Read %lu bytes, in total %llu bytes (%0.2f %%)",
                                 data.length, bytesReadTotal, (double)bytesReadTotal / file.size * 100);
                           
                           if (data) {
@@ -351,7 +351,7 @@ static NSString *password = nil;
                                   
                                   XCTAssert(error == nil, @"Error: %@", error);
                                   
-                                  NSLog(@"Read %ld bytes, in total %llu bytes (%0.2f %%)",
+                                  NSLog(@"Read %lu bytes, in total %llu bytes (%0.2f %%)",
                                         data.length, bytesReadTotal, (double)bytesReadTotal / file.size * 100);
                                   
                                   if (data) {
@@ -386,7 +386,6 @@ static NSString *password = nil;
             
             [self waitForExpectationsWithTimeout:5.0 handler:nil];
             
-            
             // ----------------- File status ----------------- //
             
             XCTestExpectation *statusExpectation = [self expectationWithDescription:@"File status"];
@@ -416,10 +415,10 @@ static NSString *password = nil;
                 }
             }];
             
-            [self waitForExpectationsWithTimeout:5.0 handler:nil];
+            [self waitForExpectationsWithTimeout:50.0 handler:nil];
             
             // ----------------- File filter ----------------- //
-            
+
             XCTestExpectation *filterExpectation = [self expectationWithDescription:@"File filter"];
             NSString *fileName = @"a";
             
@@ -469,11 +468,27 @@ static NSString *password = nil;
             
             [self waitForExpectationsWithTimeout:5.0 handler:nil];
             
+            // ----------------- Move file ----------------- //
+            
+            XCTestExpectation *moveFileExpectation = [self expectationWithDescription:@"Move file"];
+            
+            file = [[SMBFile alloc] initWithPath:@"/a/test.txt" share:testShare];
+            
+            [file moveTo:@"test1.txt" completion:^(NSError * _Nullable error) {
+                [moveFileExpectation fulfill];
+
+                XCTAssert(error == nil, @"Error: %@", error);
+                
+                XCTAssert(file.exists, @"File does not exist");                
+            }];
+            
+            [self waitForExpectationsWithTimeout:5.0 handler:nil];
+            
             // ----------------- Delete file ----------------- //
             
             XCTestExpectation *deleteFileExpectation = [self expectationWithDescription:@"Delete file"];
             
-            file = [[SMBFile alloc] initWithPath:@"/a/test.txt" share:testShare];
+            file = [[SMBFile alloc] initWithPath:@"/a/test1.txt" share:testShare];
             
             [file updateStatus:^(NSError * _Nullable error) {
                 XCTAssert(error == nil, @"Error: %@", error);

@@ -41,6 +41,14 @@
     return [NSString stringWithFormat:@"%@ %@(%@)/%@", [self _typeName], _netbiosName, _host, _group];
 }
 
+- (BOOL)isEqual:(id)other {
+    if (other == self)
+        return YES;
+    if (other == nil || ![other isKindOfClass:self.class])
+        return NO;
+    return [self.description isEqualToString:((SMBDevice *)other).description];
+}
+
 #pragma mark - Private methods
 
 - (NSString *)_typeName {

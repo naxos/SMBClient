@@ -54,6 +54,8 @@
 }
 
 - (void)dealloc {
+//    [self close:nil];
+//    smb_tree_disconnect(_server.smbSession, _shareID);
 }
 
 - (NSString *)description {
@@ -110,9 +112,9 @@
                     p = [p stringByAppendingFormat:@"\\%@", [directories objectAtIndex:i]];
                     
                     const char *cpath = p.UTF8String;
-                    smb_stat stat = [self _stat:cpath];
+                    SMBStat *stat = [self _stat:cpath];
                     
-                    if (stat == NULL) {
+                    if (!stat.exists) {
                         int dsm_error = smb_directory_create(self.server.smbSession, _shareID, cpath);
                         
                         if (dsm_error != 0) {
@@ -123,20 +125,10 @@
                     if (error == nil && i == directories.count - 1) {
                         file = [[SMBFile alloc] initWithPath:path share:self];
                         
-                        if (stat == NULL) {
+                        if (!stat.exists) {
                             stat = [self _stat:cpath];
                         }
-                        
-                        if (stat != NULL) {
-                            file.smbStat = [[SMBStat alloc] initWithStat:stat];
-                        } else {
-                            // shouldn't really happen, because we just created this directory
-                            file.smbStat = [SMBStat statForNonExistingFile];
-                        }
-                    }
-                    
-                    if (stat != NULL) {
-                        smb_stat_destroy(stat);
+                        file.smbStat = stat;
                     }
                 }
                 
@@ -165,9 +157,9 @@
                 
                 NSString *smbPath = [path stringByReplacingOccurrencesOfString:@"/" withString:@"\\"];
                 const char *cpath = smbPath.UTF8String;
-                smb_stat stat = [self _stat:cpath];
+                SMBStat *stat = [self _stat:cpath];
                 
-                if (stat == NULL) {
+                if (!stat.exists) {
                     int dsm_error = smb_directory_create(self.server.smbSession, _shareID, cpath);
                     
                     if (dsm_error != 0) {
@@ -178,20 +170,10 @@
                 if (error == nil) {
                     file = [[SMBFile alloc] initWithPath:path share:self];
                     
-                    if (stat == NULL) {
+                    if (!stat.exists) {
                         stat = [self _stat:cpath];
                     }
-                    
-                    if (stat != NULL) {
-                        file.smbStat = [[SMBStat alloc] initWithStat:stat];
-                    } else {
-                        // shouldn't really happen, because we just created this directory
-                        file.smbStat = [SMBStat statForNonExistingFile];
-                    }
-                }
-                
-                if (stat != NULL) {
-                    smb_stat_destroy(stat);
+                    file.smbStat = stat;
                 }
             } else {
                 error = [SMBError notOpenError];
@@ -234,16 +216,10 @@
                 NSString *smbPath = [path stringByReplacingOccurrencesOfString:@"/" withString:@"\\"];
                 const char *cpath = smbPath.UTF8String;
                 uint32_t mod = [self _mod:mode];
-                smb_stat stat = [self _stat:cpath];
 
                 file = [[SMBFile alloc] initWithPath:path share:self];
-
-                if (stat != NULL) {
-                    file.smbStat = [[SMBStat alloc] initWithStat:stat];
-                } else {
-                    file.smbStat = [SMBStat statForNonExistingFile];
-                }
-
+                file.smbStat = [self _stat:cpath];
+                
                 int dsm_error = smb_fopen(self.server.smbSession, self.shareID, cpath, mod, &fd);
                 
                 if (dsm_error != 0) {
@@ -278,15 +254,9 @@
                 
                 NSString *smbPath = [path stringByReplacingOccurrencesOfString:@"/" withString:@"\\"];
                 const char *cpath = smbPath.UTF8String;
-                smb_stat stat = [self _stat:cpath];
                 
                 file = [[SMBFile alloc] initWithPath:path share:self];
-                
-                if (stat != NULL) {
-                    file.smbStat = [[SMBStat alloc] initWithStat:stat];
-                } else {
-                    file.smbStat = [SMBStat statForNonExistingFile];
-                }
+                file.smbStat = [self _stat:cpath];
 
             } else {
                 error = [SMBError notOpenError];
@@ -312,12 +282,12 @@
                 
                 NSString *smbPath = [path stringByReplacingOccurrencesOfString:@"/" withString:@"\\"];
                 const char *cpath = smbPath.UTF8String;
-                smb_stat stat = [self _stat:cpath];
+                SMBStat *stat = [self _stat:cpath];
                 
-                if (stat != NULL) {
+                if (stat.exists) {
                     int dsm_error = 0;
                     
-                    if (smb_stat_get(stat, SMB_STAT_ISDIR) != 0) {
+                    if (stat.isDirectory) {
                         dsm_error = smb_directory_rm(self.server.smbSession, _shareID, cpath);
                     } else {
                         dsm_error = smb_file_rm(self.server.smbSession, _shareID, cpath);
@@ -326,8 +296,6 @@
                     if (dsm_error != 0) {
                         error = [SMBError dsmError:dsm_error session:self.server.smbSession];
                     }
-                    
-                    smb_stat_destroy(stat);
                 }
                 
             } else {
@@ -395,6 +363,13 @@
                         }
                     }
                     smb_stat_list_destroy(statList);
+                } else {
+                    /*
+                    uint32_t nt_status = smb_session_get_nt_status(self.server.smbSession);
+                    if (nt_status != NT_STATUS_SUCCESS) {
+                        error = [SMBError dsmError:DSM_ERROR_NT session:self.server.smbSession];
+                    }
+                    */
                 }
                 
             } else {
@@ -412,6 +387,39 @@
     });
 }
 
+- (void)moveFile:(NSString *)oldPath to:(NSString *)newPath completion:(void (^)(SMBFile *, NSError *))completion {
+    dispatch_async(_serialQueue, ^{
+        NSError *error = nil;
+        SMBFile *file = nil;
+        
+        if (self.server.smbSession) {
+            if ([self isOpen]) {
+                NSString *smbOldPath = [oldPath stringByReplacingOccurrencesOfString:@"/" withString:@"\\"];
+                NSString *smbNewPath = [newPath stringByReplacingOccurrencesOfString:@"/" withString:@"\\"];
+
+                int res = smb_file_mv(self.server.smbSession, _shareID, smbOldPath.UTF8String, smbNewPath.UTF8String);
+                
+                if (res != 0) {
+                    error = [SMBError notSuchFileOrDirectory];
+                } else {
+                    file = [SMBFile fileWithPath:newPath share:self];
+                    file.smbStat = [self _stat:smbNewPath.UTF8String];
+                }
+            } else {
+                error = [SMBError notOpenError];
+            }
+        } else {
+            error = [SMBError notConnectedError];
+        }
+        
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completion(file, error);
+            });
+        }
+    });
+}
+
 - (void)getStatusOfFile:(NSString *)path completion:(void (^)(SMBStat *, NSError *))completion {
 
     if (path.length == 0 || [path isEqualToString:@"/"]) {
@@ -424,19 +432,9 @@
             SMBStat *smbStat = nil;
             
             if (self.server.smbSession) {
-                
                 if ([self isOpen]) {
                     NSString *smbPath = [path stringByReplacingOccurrencesOfString:@"/" withString:@"\\"];
-                    smb_stat stat = [self _stat:smbPath.UTF8String];
-                    
-                    if (stat != NULL) {
-                        smbStat = [SMBStat statWithStat:stat];
-                        
-                        smb_stat_destroy(stat);
-                    } else {
-                        smbStat = [SMBStat statForNonExistingFile];
-                    }
-                    
+                    smbStat = [self _stat:smbPath.UTF8String];
                 } else {
                     error = [SMBError notOpenError];
                 }
@@ -455,8 +453,9 @@
 
 #pragma mark - Private methods
 
-- (smb_stat)_stat:(const char *)path {
+- (SMBStat *)_stat:(const char *)path {
     smb_stat stat = smb_fstat(self.server.smbSession, _shareID, path);
+    SMBStat *smbStat = [SMBStat statForNonExistingFile];
     
     // This is a workaround because the above doesn't seem to work on directories
     // See https://github.com/videolabs/libdsm/issues/79
@@ -469,14 +468,20 @@
             
             if (listCount == 1) {
                 stat = smb_stat_list_at(statList, 0);
+                smbStat = [SMBStat statWithStat:stat];
             } else {
                 NSLog(@"Unexpectedly got multiple stat entries for %s", path);
             }
+            
+            smb_stat_list_destroy(statList);
         }
+    } else {
+        smbStat = [SMBStat statWithStat:stat];
+        smb_stat_destroy(stat);
     }
     // end of workaround
     
-    return stat;
+    return smbStat;
 }
 
 @end

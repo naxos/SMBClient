@@ -78,7 +78,13 @@
 }
 
 - (instancetype)initWithPath:(NSString *)path relativeToFile:(SMBFile *)file {
-    NSURL *url = [NSURL fileURLWithPath:file.path];
+    NSString *p = file.path;
+    
+    if (file.isDirectory) {
+        p = [p stringByAppendingString:@"/"];
+    }
+    
+    NSURL *url = [NSURL fileURLWithPath:p];
     NSString *absolutePath = [NSURL fileURLWithPath:path relativeToURL:url].path;
     
     return [self initWithPath:absolutePath share:file.share];
@@ -96,7 +102,13 @@
 
 - (SMBFile *)parent {
     SMBFile *parent = nil;
-    NSString *path = [self.path stringByDeletingLastPathComponent];
+    NSString *path;
+    
+    if ([self.path isEqualToString:@"/"]) {
+        path = nil;
+    } else {
+        path = [self.path stringByDeletingLastPathComponent];
+    }
     
     if (path.length) {
         parent = [[SMBFile alloc] initWithPath:path share:self.share];
@@ -216,7 +228,7 @@
                 
                 while (!finished) {
                     
-                    NSUInteger bytesToRead = maxBytes == 0 ? bufferSize : MIN(bufferSize, maxBytes - bytesReadTotal);
+                    NSUInteger bytesToRead = maxBytes == 0 ? bufferSize : MIN(bufferSize, (NSUInteger)(maxBytes - bytesReadTotal));
                     long bytesRead = smb_fread(self.share.server.smbSession, _fileID, buf, bytesToRead);
                     
                     if (bytesRead < 0) {
@@ -326,7 +338,7 @@
 }
 
 - (void)listFilesUsingFilter:(nullable BOOL (^)(SMBFile *_Nonnull file))filter completion:(nullable void (^)(NSArray<SMBFile *> *_Nullable files, NSError *_Nullable error))completion {
-    if (_smbStat == nil || !self.exists) {
+    //if (_smbStat == nil || !self.exists) {
         [self updateStatus:^(NSError *error) {
             if (error) {
                 if (completion) {
@@ -334,13 +346,17 @@
                         completion(nil, error);
                     });
                 }
+            } else if (!self.hasStatus || !self.isDirectory) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completion(nil, [SMBError notSuchFileOrDirectory]);
+                });
             } else {
                 [self.share listFiles:self.path filter:filter completion:completion];
             }
         }];
-    } else {
-        [self.share listFiles:self.path filter:filter completion:completion];
-    }
+    //} else {
+    //    [self.share listFiles:self.path filter:filter completion:completion];
+    //}
 }
 
 - (void)updateStatus:(nullable void (^)(NSError *_Nullable))completion {
@@ -386,6 +402,22 @@
     [self.share deleteFile:self.path completion:^(NSError * _Nullable error) {
         if (error == nil) {
             _smbStat = [SMBStat statForNonExistingFile];
+        }
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completion(error);
+            });
+        }
+    }];
+}
+
+- (void)moveTo:(nonnull NSString *)path completion:(nullable void (^)(NSError *_Nullable))completion {
+    SMBFile *f = [SMBFile fileWithPath:path relativeToFile:self];
+    
+    [self.share moveFile:self.path to:f.path completion:^(SMBFile *_Nullable newFile, NSError * _Nullable error) {
+        if (error == nil) {
+            _smbStat = newFile.smbStat;
+            _path = newFile.path;
         }
         if (completion) {
             dispatch_async(dispatch_get_main_queue(), ^{
