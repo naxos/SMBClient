@@ -57,14 +57,19 @@
 }
 
 - (void)connectAsUser:(NSString *)username password:(NSString *)password completion:(void (^)(BOOL, NSError *))completion {
+    [self connectAsUser:username password:password domain:nil completion:completion];
+}
+
+- (void)connectAsUser:(NSString *)username password:(NSString *)password domain:(NSString *)domain completion:(void (^)(BOOL, NSError *))completion {
     [self disconnect:^{
 
-        dispatch_async(_serialQueue, ^{
+        dispatch_async(self->_serialQueue, ^{
             
             const char *name = self.netbiosName.UTF8String;
             const char *host = self.host.UTF8String;
             const char *user = username.length > 0 ? username.UTF8String : " ";
             const char *pass = password.length > 0 ? password.UTF8String : " ";
+            const char *domn = domain.length > 0 ? domain.UTF8String : " ";
             NSError *error = nil;
             BOOL guest = NO;
             const struct hostent *host_entry = gethostbyname(host);
@@ -75,27 +80,27 @@
                 error = [SMBError noIPAddressError];
             } else {
                 
-                _smbSession = smb_session_new();
+                self->_smbSession = smb_session_new();
                 
-                if (_smbSession) {
+                if (self->_smbSession) {
                     const struct in_addr addr = *(struct in_addr *)host_entry->h_addr_list[0];
                     
-                    smb_session_set_creds(_smbSession, name, user, pass);
+                    smb_session_set_creds(self->_smbSession, domn, user, pass);
                     
                     // Connect to the host
-                    int result = smb_session_connect(_smbSession, name, addr.s_addr, SMB_TRANSPORT_TCP);
+                    int result = smb_session_connect(self->_smbSession, name, addr.s_addr, SMB_TRANSPORT_TCP);
                     
                     if (result == 0) {
                         // Login
-                        result = smb_session_login(_smbSession);
+                        result = smb_session_login(self->_smbSession);
                     }
                     
                     if (result == 0) {
-                        if (smb_session_is_guest(_smbSession) > 0) {
+                        if (smb_session_is_guest(self->_smbSession) > 0) {
                             guest = YES;
                         }
                     } else {
-                        error = [SMBError dsmError:result session:_smbSession];
+                        error = [SMBError dsmError:result session:self->_smbSession];
                         
                         [self disconnect:nil];
                     }
@@ -117,9 +122,9 @@
 - (void)disconnect:(nullable void (^)(void))completion {
     
     dispatch_async(_serialQueue, ^{
-        if (_smbSession) {
-            smb_session_destroy(_smbSession);
-            _smbSession = nil;
+        if (self->_smbSession) {
+            smb_session_destroy(self->_smbSession);
+            self->_smbSession = nil;
         }
         
         if (completion) {

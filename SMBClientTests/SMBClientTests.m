@@ -30,13 +30,15 @@
 
 
 // netbios name, ip address or hostname of the server
-static NSString *host = @"imac";
+static NSString *host = @"server";
 // name of a share on the server
 static NSString *fileShare = @"Guest Share";
 // credentials of a user with write access to the share,
 // nil (or anything invalid) for guest access (if available)
 static NSString *username = nil;
 static NSString *password = nil;
+// The domain or nil if not in a domain
+static NSString *domain = nil;
 
 
 @interface SMBClientTests : XCTestCase
@@ -86,7 +88,7 @@ static NSString *password = nil;
     if (server) {
         XCTestExpectation *connectExpectation = [self expectationWithDescription:@"Connection"];
         
-        [server connectAsUser:username password:password completion:^(BOOL guest, NSError *error) {
+        [server connectAsUser:username password:password domain:domain completion:^(BOOL guest, NSError *error) {
             
             [connectExpectation fulfill];
             

@@ -31,6 +31,7 @@
 
 - (void)disconnect:(nullable void (^)(void))completion;
 - (void)connectAsUser:(nullable NSString *)username password:(nullable NSString *)password completion:(nullable void (^)(BOOL guest, NSError *_Nullable error))completion;
+- (void)connectAsUser:(nullable NSString *)username password:(nullable NSString *)password domain:(nullable NSString *)domain completion:(nullable void (^)(BOOL guest, NSError *_Nullable error))completion;
 - (void)listShares:(nullable void (^)(NSArray<SMBShare *> *_Nullable shares, NSError *_Nullable error))completion;
 - (void)findShare:(nonnull NSString *)name completion:(nullable void (^)(SMBShare *_Nullable share, NSError *_Nullable error))completion;
 

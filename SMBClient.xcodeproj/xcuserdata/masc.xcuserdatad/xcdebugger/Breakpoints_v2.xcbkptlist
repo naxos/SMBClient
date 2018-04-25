@@ -10,13 +10,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SMBClient/SMBFile.m"
-            timestampString = "487768335.48244"
+            timestampString = "546348935.632665"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "417"
             endingLineNumber = "417"
             landmarkName = "-moveTo:completion:"
-            landmarkType = "5">
+            landmarkType = "7">
             <Locations>
                <Location
                   shouldBeEnabled = "Yes"
@@ -26,7 +26,7 @@
                   moduleName = "SMBClient"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/masc/Workspace/10_Projects/_GitHub/_SMBCLient/SMBClient/SMBFile.m"
-                  timestampString = "532011284.470134"
+                  timestampString = "546348892.991431"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "417"
@@ -41,12 +41,27 @@
                   moduleName = "SMBClient"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/masc/Workspace/10_Projects/_GitHub/_SMBCLient/SMBClient/SMBFile.m"
-                  timestampString = "532011284.471887"
+                  timestampString = "546348892.993958"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "418"
                   endingLineNumber = "418"
                   offsetFromSymbolStart = "78">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__destroy_helper_block_.197"
+                  moduleName = "SMBClient"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/masc/Workspace/10_Projects/_GitHub/_SMBCLient/SMBClient/SMBFile.m"
+                  timestampString = "546348892.997396"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "417"
+                  endingLineNumber = "417"
+                  offsetFromSymbolStart = "16">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -58,13 +73,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SMBClient/SMBShare.m"
-            timestampString = "487768376.992753"
+            timestampString = "546348935.632973"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "397"
             endingLineNumber = "397"
             landmarkName = "-moveFile:to:completion:"
-            landmarkType = "5">
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -74,13 +89,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SMBClient/SMBShare.m"
-            timestampString = "487768646.5074"
+            timestampString = "546348935.633019"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "403"
             endingLineNumber = "403"
             landmarkName = "-moveFile:to:completion:"
-            landmarkType = "5">
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

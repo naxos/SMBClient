@@ -66,7 +66,7 @@
     dispatch_async(_serialQueue, ^{
         [self.server openShare:self.name completion:^(smb_tid shareID, NSError *error){
             if (error == nil) {
-                _shareID = shareID;
+                self->_shareID = shareID;
             }
             if (completion) {
                 completion(error);
@@ -77,13 +77,13 @@
 
 - (void)close:(nullable void (^)(NSError *_Nullable))completion {
     dispatch_async(_serialQueue, ^{
-        if (_shareID == 0) {
+        if (self->_shareID == 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 completion([SMBError notOpenError]);
             });
         } else {
-            [self.server closeShare:_shareID completion:completion];
-            _shareID = 0;
+            [self.server closeShare:self->_shareID completion:completion];
+            self->_shareID = 0;
         }
     });
 }
@@ -115,7 +115,7 @@
                     SMBStat *stat = [self _stat:cpath];
                     
                     if (!stat.exists) {
-                        int dsm_error = smb_directory_create(self.server.smbSession, _shareID, cpath);
+                        int dsm_error = smb_directory_create(self.server.smbSession, self->_shareID, cpath);
                         
                         if (dsm_error != 0) {
                             error = [SMBError dsmError:dsm_error session:self.server.smbSession];
@@ -160,7 +160,7 @@
                 SMBStat *stat = [self _stat:cpath];
                 
                 if (!stat.exists) {
-                    int dsm_error = smb_directory_create(self.server.smbSession, _shareID, cpath);
+                    int dsm_error = smb_directory_create(self.server.smbSession, self->_shareID, cpath);
                     
                     if (dsm_error != 0) {
                         error = [SMBError dsmError:dsm_error session:self.server.smbSession];
@@ -288,9 +288,9 @@
                     int dsm_error = 0;
                     
                     if (stat.isDirectory) {
-                        dsm_error = smb_directory_rm(self.server.smbSession, _shareID, cpath);
+                        dsm_error = smb_directory_rm(self.server.smbSession, self->_shareID, cpath);
                     } else {
-                        dsm_error = smb_file_rm(self.server.smbSession, _shareID, cpath);
+                        dsm_error = smb_file_rm(self.server.smbSession, self->_shareID, cpath);
                     }
 
                     if (dsm_error != 0) {
@@ -339,7 +339,7 @@
                 smbPath = [smbPath stringByAppendingString:@"*"];
                 
                 //Query for a list of files in this directory
-                smb_stat_list statList = smb_find(self.server.smbSession, _shareID, smbPath.UTF8String);
+                smb_stat_list statList = smb_find(self.server.smbSession, self->_shareID, smbPath.UTF8String);
                 
                 if (statList != NULL) {
                     size_t listCount = smb_stat_list_count(statList);
@@ -397,7 +397,7 @@
                 NSString *smbOldPath = [oldPath stringByReplacingOccurrencesOfString:@"/" withString:@"\\"];
                 NSString *smbNewPath = [newPath stringByReplacingOccurrencesOfString:@"/" withString:@"\\"];
 
-                int res = smb_file_mv(self.server.smbSession, _shareID, smbOldPath.UTF8String, smbNewPath.UTF8String);
+                int res = smb_file_mv(self.server.smbSession, self->_shareID, smbOldPath.UTF8String, smbNewPath.UTF8String);
                 
                 if (res != 0) {
                     error = [SMBError notSuchFileOrDirectory];

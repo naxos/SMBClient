@@ -123,8 +123,8 @@
     
         [self.share openFile:self.path mode:mode completion:^(SMBFile *file, smb_fd fileID, NSError *error) {
             if (error == nil) {
-                _fileID = fileID;
-                _smbStat = file.smbStat;
+                self->_fileID = fileID;
+                self->_smbStat = file.smbStat;
             }
             if (completion) {
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -140,15 +140,15 @@
 
     dispatch_async(_serialQueue, ^{
 
-        if (_fileID == 0) {
+        if (self->_fileID == 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 completion([SMBError notOpenError]);
             });
         } else {
-            [self.share closeFile:_fileID path:self.path completion:^(SMBFile *file, NSError * _Nullable error) {
+            [self.share closeFile:self->_fileID path:self.path completion:^(SMBFile *file, NSError * _Nullable error) {
                 if (error == nil) {
-                    _fileID = 0;
-                    _smbStat = file.smbStat;
+                    self->_fileID = 0;
+                    self->_smbStat = file.smbStat;
                 }
                 if (completion) {
                     dispatch_async(dispatch_get_main_queue(), ^{
@@ -175,7 +175,7 @@
         if (self.share.server.smbSession) {
             if ([self isOpen]) {
                 
-                off_t pos = smb_fseek(self.share.server.smbSession, _fileID, offset, absolute ? SMB_SEEK_SET : SMB_SEEK_CUR);
+                off_t pos = smb_fseek(self.share.server.smbSession, self->_fileID, offset, absolute ? SMB_SEEK_SET : SMB_SEEK_CUR);
                 
                 position = MAX(0L, pos);
                 
@@ -229,7 +229,7 @@
                 while (!finished) {
                     
                     NSUInteger bytesToRead = maxBytes == 0 ? bufferSize : MIN(bufferSize, (NSUInteger)(maxBytes - bytesReadTotal));
-                    long bytesRead = smb_fread(self.share.server.smbSession, _fileID, buf, bytesToRead);
+                    long bytesRead = smb_fread(self.share.server.smbSession, self->_fileID, buf, bytesToRead);
                     
                     if (bytesRead < 0) {
                         finished = YES;
@@ -300,7 +300,7 @@
                         finished = YES;
                     } else {
                         long bytesToWrite = data.length;
-                        long bytesWritten = smb_fwrite(self.share.server.smbSession, _fileID, (void *)data.bytes, bytesToWrite);
+                        long bytesWritten = smb_fwrite(self.share.server.smbSession, self->_fileID, (void *)data.bytes, bytesToWrite);
                         
                         offset += MAX(0, bytesWritten);
                         
@@ -362,7 +362,7 @@
 - (void)updateStatus:(nullable void (^)(NSError *_Nullable))completion {
     [self.share getStatusOfFile:self.path completion:^(SMBStat * _Nullable smbStat, NSError * _Nullable error) {
         if (error == nil) {
-            _smbStat = smbStat;
+            self->_smbStat = smbStat;
         }
         if (completion) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -375,7 +375,7 @@
 - (void)createDirectory:(nullable void (^)(NSError *_Nullable))completion {
     [self.share createDirectory:self.path completion:^(SMBFile * _Nullable file, NSError * _Nullable error) {
         if (error == nil) {
-            _smbStat = file.smbStat;
+            self->_smbStat = file.smbStat;
         }
         if (completion) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -388,7 +388,7 @@
 - (void)createDirectories:(nullable void (^)(NSError *_Nullable))completion {
     [self.share createDirectories:self.path completion:^(SMBFile * _Nullable file, NSError * _Nullable error) {
         if (error == nil) {
-            _smbStat = file.smbStat;
+            self->_smbStat = file.smbStat;
         }
         if (completion) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -401,7 +401,7 @@
 - (void)delete:(nullable void (^)(NSError *_Nullable))completion {
     [self.share deleteFile:self.path completion:^(NSError * _Nullable error) {
         if (error == nil) {
-            _smbStat = [SMBStat statForNonExistingFile];
+            self->_smbStat = [SMBStat statForNonExistingFile];
         }
         if (completion) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -416,8 +416,8 @@
     
     [self.share moveFile:self.path to:f.path completion:^(SMBFile *_Nullable newFile, NSError * _Nullable error) {
         if (error == nil) {
-            _smbStat = newFile.smbStat;
-            _path = newFile.path;
+            self->_smbStat = newFile.smbStat;
+            self->_path = newFile.path;
         }
         if (completion) {
             dispatch_async(dispatch_get_main_queue(), ^{
